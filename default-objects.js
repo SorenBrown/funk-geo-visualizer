@@ -1149,7 +1149,6 @@ export class ForwardFunkBall extends Site {
     this.computeHilbertBall();
   }
 
-<<<<<<< HEAD
   computeHilbertBall() { 
     this.pointsOnBall = getPointsOnForwardFunkBall(this, this.ballRadius); 
     this.polygon = new ConvexPolygon(this.pointsOnBall, this.boundaryColor, this.polygon.penWidth);
@@ -1404,8 +1403,3 @@ export class MultiBall extends Site {
       }
     }
 }
-=======
-// console.log("omega: ", omega);
-// let mehb = new minimumEnclosingHilbertBall(points, omega);
-// console.log("mehb: ", mehb);
->>>>>>> parent of 5a0ca18 (ok)
