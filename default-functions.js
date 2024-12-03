@@ -12,6 +12,11 @@ import {
   MinimumEnclosingHilbertBall
 } from './default-objects.js';
 
+export function pointInPolygon(x, y, polygon) {
+  const point = new Point(x, y);
+  return polygon.contains(point);
+}
+
 export function getPolarBody(polygon, hilbertBall) {
   // Ensure the polygon has at least 3 vertices
   if (polygon.vertices.length < 3) {
@@ -209,9 +214,9 @@ export function getPointOnSpokeForward(C, A, r) {
 export function getPointsOnForwardFunkBall(center, radius) {
   let points = [];
   center.spokes.forEach(({ A, C, D }) => {
-    // points.push(getPointOnSpokeForward(C, D, radius));
+    // points.push(getPointOnSpokeForward(C, A, radius));
     points.push(getPointOnSpokeForward(C, A, radius));
-    
+
   });
   return convexHull(points);
 }
@@ -1607,4 +1612,11 @@ export function perturbPolygon(polygon, epsilon = 0.5, direction = 1) {
       );
   });
   return new ConvexPolygon(perturbedVertices, polygon.color);
+}
+
+export function thompsonDistance(site1, site2, polygon) {
+  let siteSegment = new Segment(site1, site2);
+  let intersectionPoints = polygon.intersectWithLine(siteSegment);
+  let [I1, S1, S2, I2] = getCollinearPoints(site1, site2, intersectionPoints);
+  return Math.max(Math.log(norm(S1, I2) / norm(S2, I2)), Math.log(norm(S2, I1) / norm(S1, I1)));
 }

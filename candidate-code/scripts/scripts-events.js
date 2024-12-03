@@ -12,7 +12,6 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
     const ffunkCollapsible = document.getElementById('ffunkBallCollapsible');
     const rfunkCollapsible = document.getElementById('rfunkBallCollapsible');
     const thompsonCollapsible = document.getElementById('thompsonBallCollapsible');
-    const customInsertCollapsible = document.querySelectorAll('#siteCollapsible')[1];
     const savedDistancesContainer = document.getElementById('savedDistancesContainer');
     const savedBisectorsContainer = document.getElementById('savedBisectorsContainer');
     const metricBallSelectionCard = document.getElementById('metricBallSelectionCard'); // New card
@@ -30,14 +29,11 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
             setDisplay(ffunkCollapsible, 'block');
             setDisplay(rfunkCollapsible, 'block');
             setDisplay(thompsonCollapsible, 'block');
-            setDisplay(customInsertCollapsible, 'block');
             setDisplay(savedDistancesContainer, 'none');
             setDisplay(savedBisectorsContainer, 'none');
             setDisplay(metricBallSelectionCard, 'block'); // Show the card
             setDisplay(settingsLabel, 'block'); 
             setDisplay(siteColorInput, 'none'); 
-
-            insertSiteButton.textContent = 'Insert Metric Ball(s)';
 
             managers.forEach(manager => {
                 if (manager.name === 'HilbertBallManager') manager.activate();
@@ -52,13 +48,11 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
             setDisplay(ffunkCollapsible, 'none');
             setDisplay(rfunkCollapsible, 'none');
             setDisplay(thompsonCollapsible, 'none');
-            setDisplay(customInsertCollapsible, 'block');
             setDisplay(savedDistancesContainer, 'none');
             setDisplay(savedBisectorsContainer, 'none');
             setDisplay(metricBallSelectionCard, 'none'); // Hide the card
             setDisplay(settingsLabel, 'block'); 
             setDisplay(siteColorInput, 'block');
-            insertSiteButton.textContent = 'Insert Site';
 
             managers.forEach(manager => {
                 if (manager.name === 'SiteManager') manager.activate();
@@ -70,7 +64,6 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
         'Hilbert Distance': () => {
             setDisplay(siteCollapsible, 'block');
             setDisplay(savedDistancesContainer, 'block');
-            setDisplay(customInsertCollapsible, 'none');
             setDisplay(hilbertCollapsible, 'none');
             setDisplay(ffunkCollapsible, 'none');
             setDisplay(rfunkCollapsible, 'none');
@@ -92,7 +85,6 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
         },
         'Bisector': () => {
             setDisplay(siteCollapsible, 'none');
-            setDisplay(customInsertCollapsible, 'none');
             setDisplay(hilbertCollapsible, 'none');
             setDisplay(ffunkCollapsible, 'none');
             setDisplay(rfunkCollapsible, 'none');
@@ -114,9 +106,24 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
 
             canvas.activeManager = 'BisectorManager';
         },
+        'Hilbert Metric Space': () => {
+            setDisplay(siteCollapsible, 'none');
+            setDisplay(hilbertCollapsible, 'none');
+            setDisplay(ffunkCollapsible, 'none');
+            setDisplay(rfunkCollapsible, 'none');
+            setDisplay(thompsonCollapsible, 'none');
+            setDisplay(savedDistancesContainer, 'none');
+            setDisplay(savedBisectorsContainer, 'none');
+            setDisplay(metricBallSelectionCard, 'none');
+            setDisplay(siteColorInput, 'none'); 
+            setDisplay(settingsLabel, 'none'); 
+
+            managers.forEach(manager => { manager.deactivate(); });
+
+            canvas.activeManager = 'SpaceManager';
+        },
         'default': () => {
             setDisplay(siteCollapsible, 'none');
-            setDisplay(customInsertCollapsible, 'none');
             setDisplay(hilbertCollapsible, 'none');
             setDisplay(ffunkCollapsible, 'none');
             setDisplay(rfunkCollapsible, 'none');
@@ -190,57 +197,6 @@ export function initializeAddSiteListener(canvasElement, managers, canvas) {
         }
     });
 }
-function clearInput(inputElement) {
-    inputElement.value = '';
-}
-
-function handleInsertClick(managers) {
-    const insertSiteXInput = document.getElementById('insertSiteX');
-    const insertSiteYInput = document.getElementById('insertSiteY');
-    const x = parseFloat(insertSiteXInput.value);
-    const y = parseFloat(insertSiteYInput.value);
-
-    if (isNaN(x) || isNaN(y)) {
-        alert('Please enter valid X and Y coordinates');
-        return;
-    }
-
-    const selectedProgram = document.querySelector('.dropdown .selected').innerText;
-    const selectedManager = selectedProgram.replace(/\s/g, '') + 'Manager';
-
-    managers.find(manager => {
-        if (manager.active && manager.name === selectedManager) {
-            manager.addSite(null,x,y);
-            return true;
-        }
-        return false;
-    });
-
-    clearInput(insertSiteXInput);
-    clearInput(insertSiteYInput);
-}
-
-export function initializeInsertSiteListeners(managers) {
-    const insertSiteXInput = document.getElementById('insertSiteX');
-    const insertSiteYInput = document.getElementById('insertSiteY');
-    const insertSiteButton = document.getElementById('insertSiteButton');
-    const clearInsertSiteXButton = document.getElementById('clearInsertSiteX');
-    const clearInsertSiteYButton = document.getElementById('clearInsertSiteY');
-
-    insertSiteXInput.addEventListener('focus', () => managers.forEach(manager => {
-        if (manager instanceof HilbertBallManager || manager instanceof SiteManager) {
-            manager.deselectAllSites();
-        }
-    }));
-    insertSiteYInput.addEventListener('focus', () => managers.forEach(manager => {
-        if (manager instanceof HilbertBallManager || manager instanceof SiteManager) {
-            manager.deselectAllSites();
-        }
-    }));
-    insertSiteButton.addEventListener('click', () => handleInsertClick(managers));
-    clearInsertSiteXButton.addEventListener('click', () => clearInput(insertSiteXInput));
-    clearInsertSiteYButton.addEventListener('click', () => clearInput(insertSiteYInput));
-}
 
 export function initCollapsibleAnimation() {
     const collapsibles = document.querySelectorAll('.collapsible-header');
@@ -254,26 +210,13 @@ export function initCollapsibleAnimation() {
     });
 }
 
-// document.addEventListener('DOMContentLoaded', () => {
-//     const hilbertCheckbox = document.getElementById('hilbertBallCheckbox');
-//     const ffunkCheckbox = document.getElementById('ffunkBallCheckbox');
-//     const rfunkCheckbox = document.getElementById('rfunkBallCheckbox');
-//     const thompsonCheckbox = document.getElementById('thompsonBallCheckbox');
+const inputs = document.querySelectorAll('.radius-input-style');
 
-//     function getSelectedBalls() {
-//         const selected = [];
-//         if (hilbertCheckbox.checked) selected.push('Hilbert Ball');
-//         if (ffunkCheckbox.checked) selected.push('Forward Funk Ball');
-//         if (rfunkCheckbox.checked) selected.push('Reverse Funk Ball');
-//         if (thompsonCheckbox.checked) selected.push('Thompson Ball');
-//         return selected;
-//     }
-
-//     // Example: Handling double-click inside the polygon to add selected balls
-//     document.getElementById('canvas').addEventListener('dblclick', (event) => {
-//         const selectedBalls = getSelectedBalls();
-//         console.log('Creating balls:', selectedBalls);
-//         // Logic to create the selected balls goes here
-//     });
-// });
+inputs.forEach((input) => {
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'Delete' || event.keyCode === 46) {
+      event.stopPropagation();
+    }
+  });
+});
 

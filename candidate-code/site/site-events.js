@@ -172,6 +172,7 @@ export function initContextMenu(siteManager) {
     const calculateHilbertDistanceItem = document.getElementById('calculateHilbertDistance');
     const saveHilbertDistanceItem = document.getElementById('saveHilbertDistance');
     const drawBisector = document.getElementById('drawBisector');
+    const drawThompsonBisector = document.getElementById('drawThompsonBisector');
 
     // Hide context menu on any click
     document.addEventListener('click', () => {
@@ -196,6 +197,7 @@ export function initContextMenu(siteManager) {
             }
 
             drawBisector.style.display = 'block';
+            drawThompsonBisector.style.display = 'block';
 
         } else {
             contextMenu.style.display = 'none';
@@ -211,6 +213,16 @@ export function initContextMenu(siteManager) {
 
             if (selectedSites.length === 2) {
                 siteManager.hilbertDistanceManager.onTwoSitesSelected(selectedSites);
+            }
+            contextMenu.style.display = 'none';
+        });
+
+        drawThompsonBisector.addEventListener('click', () => {
+            console.log('Draw Bisector Selected');
+            const selectedSites = siteManager.getSelectedSites();
+            siteManager.hilbertDistanceManager.ensureLabels(selectedSites);
+            if (selectedSites.length === 2) {
+                siteManager.bisectorManager.createThompsonBisector(selectedSites[0], selectedSites[1]);
             }
             contextMenu.style.display = 'none';
         });

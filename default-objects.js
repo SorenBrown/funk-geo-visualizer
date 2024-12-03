@@ -1403,3 +1403,15 @@ export class MultiBall extends Site {
       }
     }
 }
+
+export class ThompsonBisector {
+  constructor(site1, site2, points) {
+    this.points = points;
+    this.site1 = site1;
+    this.site2 = site2;
+  }
+  
+  draw(ctx) {
+    this.points.forEach(pt => pt.draw(ctx));  
+  }
+}

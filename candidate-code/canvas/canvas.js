@@ -36,6 +36,7 @@ export class Canvas {
         this.selectionOrder = [];
         this.segments = [];
         this.bisectors = [];
+        this.thompsonBisectors = [];
     }
     
     setPolygonType(type) {
@@ -181,6 +182,14 @@ export class Canvas {
 
         this.polygon.draw(this.ctx);
 
+        this.thompsonBisectors = this.thompsonBisectors.filter(thompBobj => {
+            if (this.sites.includes(thompBobj.site1) && this.sites.includes(thompBobj.site2)) {
+                thompBobj.draw(this.ctx);
+                return true;
+            }
+            return false;
+        })
+
         this.sites.forEach(site => {
             site.computeSpokes();
             site.computeHilbertBall?.();
@@ -216,6 +225,7 @@ export class Canvas {
         this.bisectors = [];
         this.ngonVertices = [];
         this.polygon = new ConvexPolygon([], this.polygon.color, this.polygon.penWidth, this.polygon.showInfo, this.polygon.showVertices, this.polygon.vertexRadius);
+        this.thompsonBisectors = [];
 
         if (this.hilbertDistanceManager) {
             this.hilbertDistanceManager.resetLabels();

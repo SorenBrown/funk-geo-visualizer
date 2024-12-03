@@ -131,6 +131,7 @@
           <li>Metric Balls</li>
           <li>Hilbert Distance</li>
           <li>Bisector</li>
+          <li>Hilbert Metric Space</li>
         </ul>
       </div>
 
@@ -209,7 +210,7 @@
                   <label for="radius">Radius</label>
                   <input style="margin-bottom: 20px;" type="range" id="radius" value="1" min="0" max="3" step="0.01">
                   <div style="flex-direction: row; justify-content: center;">
-                      <input type="number" id="radiusInput" value="1" min="0" max="3" step="0.01">
+                      <input class="radius-input-style" type="number" id="radiusInput" value="1" min="0" max="3" step="0.01">
                       <i id="resetRadius" style="margin-left: 10px;" class="fa-solid fa-rotate-left reset-icon"></i>
                   </div>
               </div>
@@ -227,7 +228,7 @@
                 <label for="ffunkRadius">Radius</label>
                 <input style="margin-bottom: 20px;" type="range" id="ffunkRadius" value="1" min="0" max="3" step="0.01">
                 <div style="flex-direction: row; justify-content: center;">
-                    <input type="number" id="ffunkRadiusInput" value="1" min="0" max="3" step="0.01">
+                    <input class="radius-input-style" type="number" id="ffunkRadiusInput" value="1" min="0" max="3" step="0.01">
                     <i id="ffunkResetRadius" style="margin-left: 10px;" class="fa-solid fa-rotate-left reset-icon"></i>
                 </div>
             </div>
@@ -245,7 +246,7 @@
                   <label for="rfunkRadius">Radius</label>
                   <input style="margin-bottom: 20px;" type="range" id="rfunkRadius" value="1" min="0" max="3" step="0.01">
                   <div style="flex-direction: row; justify-content: center;">
-                      <input type="number" id="rfunkRadiusInput" value="1" min="0" max="3" step="0.01">
+                      <input class="radius-input-style" type="number" id="rfunkRadiusInput" value="1" min="0" max="3" step="0.01">
                       <i id="rfunkResetRadius" style="margin-left: 10px;" class="fa-solid fa-rotate-left reset-icon"></i>
                   </div>
               </div>
@@ -263,30 +264,11 @@
                   <label for="thompsonRadius">Radius</label>
                   <input style="margin-bottom: 20px;" type="range" id="thompsonRadius" value="1" min="0" max="3" step="0.01">
                   <div style="flex-direction: row; justify-content: center;">
-                      <input type="number" id="thompsonRadiusInput" value="1" min="0" max="3" step="0.01">
+                      <input class="radius-input-style" type="number" id="thompsonRadiusInput" value="1" min="0" max="3" step="0.01">
                       <i id="thompsonResetRadius" style="margin-left: 10px;" class="fa-solid fa-rotate-left reset-icon"></i>
                   </div>
               </div>
           </div>
-      </div>
-
-      <div class="collapsible" id="siteCollapsible">
-        <div class="collapsible-header">Custom Insert<span class="plus-minus-icon"></span></div>
-        <div class="content" style="display: none;">
-            <div id="insertSiteContainer" style="display: flex; flex-direction: column;">
-                <div style="margin-bottom: 10px; display: flex; align-items: center;">
-                    <label for="insertSiteX">X : </label>
-                    <input style="margin-left: 5px;" type="number" id="insertSiteX">
-                    <button id="clearInsertSiteX" class="clear-button"><i class="fas fa-times"></i></button>
-                </div>
-                <div style="margin-bottom: 20px; display: flex; align-items: center;">
-                    <label for="insertSiteY">Y : </label>
-                    <input style="margin-left: 5px;" type="number" id="insertSiteY">
-                    <button id="clearInsertSiteY" class="clear-button"><i class="fas fa-times"></i></button>
-                </div>
-                <button id="insertSiteButton">Insert Site</button>
-            </div>
-        </div>
       </div>
 
       <div style="display: none;" class="polygon-setting-card" id="savedDistancesContainer">
@@ -374,6 +356,7 @@
   <div class="context-menu-item" id="saveHilbertDistance" style="display:none;">Save Hilbert Distance</div>
   <div class="context-menu-item" id="calculateHilbertDistance">Calculate Hilbert Distance</div>
   <div class="context-menu-item" id="drawBisector">Draw Bisector</div>
+  <div class="context-menu-item" id="drawThompsonBisector">Draw Brute Force Thompson Bisector</div>
   <!-- <div class="context-menu-item" id="drawZRegion">Draw Z-Region</div>
   <div class="context-menu-item" id="drawSegment">Draw Segment</div>
   <div class="context-menu-item" id="calcPerimBall">Calculate Perimeter</div>
