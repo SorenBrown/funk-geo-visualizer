@@ -47,7 +47,9 @@ export class SiteManager {
     removeSite() {
         this.canvas.sites = this.canvas.sites.filter(site => {
             if (site.selected) {
+
                 this.hilbertDistanceManager.deleteSite(site);
+
                 if (site instanceof HilbertBall) {
                     this.canvas.segments = this.canvas.segments.filter(segment => !site.polygon.segments.includes(segment)); 
                 }
@@ -55,6 +57,7 @@ export class SiteManager {
             }
             return true;
         });
+        this.toggleMultiBallSliderVisibility?.();
         this.canvas.bisectors = this.canvas.bisectors.filter(bisector => {
             if (bisector.s1.selected || bisector.s2.selected) {
                 return false;

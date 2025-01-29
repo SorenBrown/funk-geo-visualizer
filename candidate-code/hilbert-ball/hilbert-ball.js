@@ -3,6 +3,11 @@ import { initMouseActions, initProperties, initShortcuts } from "./hilbert-ball-
 import { SiteManager } from "../site/site.js";
 import { mouseOnSite } from "../../default-functions.js";
 
+function getElementChecked(id) {
+    const element = document.getElementById(id);
+    return element ? element.checked : false;
+}
+
 export class HilbertBallManager extends SiteManager {
     constructor(canvas, hilbertDistanceManager, bisectorManager) {
         super(canvas, hilbertDistanceManager, bisectorManager);
@@ -34,7 +39,7 @@ export class HilbertBallManager extends SiteManager {
       }
   
       if (this.canvas.polygon.contains(new Point(x, y))) {
-          const site = new Site(x, y, this.canvas.polygon);
+          const site = new Site(x, y, this.canvas.polygon,'black',getElementChecked('siteDrawSpokes'));
   
           if (selectedBallTypes.length === 1) {
               // Create a single ball if only one type is selected
@@ -54,6 +59,7 @@ export class HilbertBallManager extends SiteManager {
           }
   
           this.drawAll();
+          this.toggleMultiBallSliderVisibility();
       }
   }
 

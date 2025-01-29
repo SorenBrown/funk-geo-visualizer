@@ -1315,7 +1315,7 @@ export class ThompsonBall extends Site {
 export class MultiBall extends Site {
     constructor(site, ballTypes = []) {
         // Call the parent Site constructor to initialize the shared site properties
-        super(site.x, site.y, site.convexPolygon, 'black'); // Default site color is black
+        super(site, null, site.convexPolygon, 'black'); // Default site color is black
 
         this.balls = ballTypes.map(({ type, ball }) => ({ type, ball })); // Store each type and corresponding ball
     }
@@ -1332,6 +1332,10 @@ export class MultiBall extends Site {
     setBallRadius(type, radius) {
         const targetBall = this.balls.find(b => b.type === type);
         if (targetBall) targetBall.ball.setBallRadius(radius);
+    }
+
+    setAllBallRadii(radius) {
+      this.balls.forEach(({ ball }) => ball.setBallRadius(radius));
     }
 
     draw(ctx) {

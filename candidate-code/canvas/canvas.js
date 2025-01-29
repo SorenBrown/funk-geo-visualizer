@@ -65,8 +65,8 @@ export class Canvas {
     
     createNgon(n) {
         const centerX = this.canvasWidth / 2.5;
-        const centerY = this.canvasHeight / 2;
-        const radius = Math.min(this.canvasWidth, this.canvasHeight) * 0.4; // 40% of the smaller dimension
+        const centerY = this.canvasHeight / 1.8;
+        const radius = Math.min(this.canvasWidth, this.canvasHeight) * 0.9; // 40% of the smaller dimension
         
         this.polygon = new ConvexPolygon();
         

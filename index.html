@@ -159,19 +159,27 @@
 
       <label id="general-settings" class="select-program" style="margin-bottom: 20px; margin-top: 25px; font-size: 16px;">Settings</label>
       
+      <div id="multiBallRadiusContainer" style="display: none;">
+        <div id="multiBallRadiusWrapper">
+            <label for="multiBallRadius">Multi Ball Radius</label>
+            <input type="number" id="multiBallRadiusInput" min="0.001" max="3" step="0.001" value="1">
+        </div>
+        <input type="range" id="multiBallRadius" min="0.001" max="3" step="0.001" value="1">
+      </div>
+      
       <div class="collapsible" id="siteCollapsible">
         <div class="collapsible-header">Site<span class="plus-minus-icon"></span></div>
         <div class="content" style="display: none;">
 
           <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;" id="colorContainer">
             <label for="siteColor">Site Color</label>
-            <input type="color" id="siteColor" value="#0000FF" class="color-dot">
+            <input type="color" id="siteColor" value="#0000FF" style="margin-left: 67%;" class="color-dot">
           </div>
 
           <div style="margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between;">
             <label for="siteDrawSpokes" class="checkbox-label">Draw Spokes</label>
             <div style="position: relative;">
-              <input style="width: 15px; height: 15px;" type="checkbox" id="siteDrawSpokes" class="checkbox-input" checked>
+              <input style="width: 15px; height: 15px;" type="checkbox" id="siteDrawSpokes" class="checkbox-input">
               <span class="checkbox-background"></span>
             </div>
           </div>
@@ -208,9 +216,9 @@
               </div>
               <div style="margin-bottom: 0px;" id="radiusContainer">
                   <label for="radius">Radius</label>
-                  <input style="margin-bottom: 20px;" type="range" id="radius" value="1" min="0" max="3" step="0.01">
+                  <input style="margin-bottom: 20px;" type="range" id="radius" value="1" min="0.0001" max="3" step="0.01">
                   <div style="flex-direction: row; justify-content: center;">
-                      <input class="radius-input-style" type="number" id="radiusInput" value="1" min="0" max="3" step="0.01">
+                      <input class="radius-input-style" type="number" id="radiusInput" value="1" min="0.0001" max="3" step="0.01">
                       <i id="resetRadius" style="margin-left: 10px;" class="fa-solid fa-rotate-left reset-icon"></i>
                   </div>
               </div>
@@ -226,9 +234,9 @@
             </div>
             <div style="margin-bottom: 0px;" id="ffunkRadiusContainer">
                 <label for="ffunkRadius">Radius</label>
-                <input style="margin-bottom: 20px;" type="range" id="ffunkRadius" value="1" min="0" max="3" step="0.01">
+                <input style="margin-bottom: 20px;" type="range" id="ffunkRadius" value="1" min="0.0001" max="3" step="0.01">
                 <div style="flex-direction: row; justify-content: center;">
-                    <input class="radius-input-style" type="number" id="ffunkRadiusInput" value="1" min="0" max="3" step="0.01">
+                    <input class="radius-input-style" type="number" id="ffunkRadiusInput" value="1" min="0.0001" max="3" step="0.01">
                     <i id="ffunkResetRadius" style="margin-left: 10px;" class="fa-solid fa-rotate-left reset-icon"></i>
                 </div>
             </div>
@@ -244,9 +252,9 @@
               </div>
               <div style="margin-bottom: 0px;" id="rfunkRadiusContainer">
                   <label for="rfunkRadius">Radius</label>
-                  <input style="margin-bottom: 20px;" type="range" id="rfunkRadius" value="1" min="0" max="3" step="0.01">
+                  <input style="margin-bottom: 20px;" type="range" id="rfunkRadius" value="1" min="0.0001" max="3" step="0.01">
                   <div style="flex-direction: row; justify-content: center;">
-                      <input class="radius-input-style" type="number" id="rfunkRadiusInput" value="1" min="0" max="3" step="0.01">
+                      <input class="radius-input-style" type="number" id="rfunkRadiusInput" value="1" min="0.0001" max="3" step="0.01">
                       <i id="rfunkResetRadius" style="margin-left: 10px;" class="fa-solid fa-rotate-left reset-icon"></i>
                   </div>
               </div>
@@ -262,14 +270,16 @@
               </div>
               <div style="margin-bottom: 0px;" id="thompsonRadiusContainer">
                   <label for="thompsonRadius">Radius</label>
-                  <input style="margin-bottom: 20px;" type="range" id="thompsonRadius" value="1" min="0" max="3" step="0.01">
+                  <input style="margin-bottom: 20px;" type="range" id="thompsonRadius" value="1" min="0.0001" max="3" step="0.01">
                   <div style="flex-direction: row; justify-content: center;">
-                      <input class="radius-input-style" type="number" id="thompsonRadiusInput" value="1" min="0" max="3" step="0.01">
+                      <input class="radius-input-style" type="number" id="thompsonRadiusInput" value="1" min="0.0001" max="3" step="0.01">
                       <i id="thompsonResetRadius" style="margin-left: 10px;" class="fa-solid fa-rotate-left reset-icon"></i>
                   </div>
               </div>
           </div>
       </div>
+
+      
 
       <div style="display: none;" class="polygon-setting-card" id="savedDistancesContainer">
         <label>Saved Distances</label>
@@ -293,7 +303,7 @@
 </div>
 
 <div id="canvasContainer">
-    <canvas id="canvas" width="1500" height="850"></canvas>
+    <canvas id="canvas" width="1500" height="950"></canvas>
 </div>
 
 <div id="modal" class="modal">

@@ -17,6 +17,7 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
     const metricBallSelectionCard = document.getElementById('metricBallSelectionCard'); // New card
     const settingsLabel = document.getElementById('general-settings');
     const siteColorInput = document.getElementById('colorContainer');
+    const multiBallRadiusContainer = document.getElementById('multiBallRadiusContainer');
 
     const setDisplay = (element, display) => {
         if (element) element.style.display = display;
@@ -34,10 +35,13 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
             setDisplay(metricBallSelectionCard, 'block'); // Show the card
             setDisplay(settingsLabel, 'block'); 
             setDisplay(siteColorInput, 'none'); 
+            setDisplay(multiBallRadiusContainer, 'block');
 
             managers.forEach(manager => {
-                if (manager.name === 'HilbertBallManager') manager.activate();
-                else manager.deactivate();
+                if (manager.name === 'HilbertBallManager') {
+                    manager.activate();
+                    manager.toggleMultiBallSliderVisibility();
+                } else manager.deactivate();
             });
 
             canvas.activeManager = 'HilbertBallManager';
@@ -53,6 +57,7 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
             setDisplay(metricBallSelectionCard, 'none'); // Hide the card
             setDisplay(settingsLabel, 'block'); 
             setDisplay(siteColorInput, 'block');
+            setDisplay(multiBallRadiusContainer, 'none');
 
             managers.forEach(manager => {
                 if (manager.name === 'SiteManager') manager.activate();
@@ -72,6 +77,7 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
             setDisplay(metricBallSelectionCard, 'none'); // Hide the card
             setDisplay(settingsLabel, 'none'); 
             setDisplay(siteColorInput, 'none'); 
+            setDisplay(multiBallRadiusContainer, 'none');
 
             managers.forEach(manager => {
                 if (manager.name === 'SiteManager' || manager.name === 'HilbertDistanceManager') {
@@ -93,6 +99,7 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
             setDisplay(savedBisectorsContainer, 'block');
             setDisplay(metricBallSelectionCard, 'none');
             setDisplay(siteColorInput, 'none'); 
+            setDisplay(multiBallRadiusContainer, 'none');
 
             setDisplay(settingsLabel, 'none'); 
 
@@ -117,6 +124,7 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
             setDisplay(metricBallSelectionCard, 'none');
             setDisplay(siteColorInput, 'none'); 
             setDisplay(settingsLabel, 'none'); 
+            setDisplay(multiBallRadiusContainer, 'none');
 
             managers.forEach(manager => { manager.deactivate(); });
 
@@ -132,6 +140,7 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
             setDisplay(savedBisectorsContainer, 'none');
             setDisplay(metricBallSelectionCard, 'none'); // Hide the card
             setDisplay(siteColorInput, 'none'); 
+            setDisplay(multiBallRadiusContainer, 'none');
         }
     };
 

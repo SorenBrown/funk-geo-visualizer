@@ -154,12 +154,11 @@ export function initProperties(hilbertBallManager) {
         { sliderId: 'thompsonRadius', inputId: 'thompsonRadiusInput', resetId: 'thompsonResetRadius' }
     ];
 
-    // Set the default boundary colors for each type of ball
     const defaultColors = {
-        HilbertBall: '#0000FF', // Blue
-        ForwardFunkBall: '#228B22', // Forest Green
-        ReverseFunkBall: '#FF0000', // Red
-        ThompsonBall: '#800080' // Purple
+        HilbertBall: '#0000FF', 
+        ForwardFunkBall: '#228B22',
+        ReverseFunkBall: '#FF0000',
+        ThompsonBall: '#800080'
     };
 
     // Apply default color to corresponding color input on initialization
@@ -202,6 +201,42 @@ export function initProperties(hilbertBallManager) {
     document.querySelectorAll('[id$="Color"]').forEach(colorInput => {
         colorInput.addEventListener('input', debouncedAssignBallAndSiteProperties);
     });
+
+    const multiBallSlider = document.getElementById('multiBallRadius');
+    const multiBallInput = document.getElementById('multiBallRadiusInput');
+    const multiBallContainer = document.getElementById('multiBallRadiusContainer');
+
+    function updateMultiBallRadius(value) {
+        hilbertBallManager.canvas.sites.forEach(site => {
+            if (site instanceof MultiBall && site.selected) {
+                site.balls.forEach(({ ball }) => {
+                    ball.setBallRadius(parseFloat(value));
+                    hilbertBallManager.updateHilbertBallProperties(ball);
+                });
+                
+            }
+        });
+        hilbertBallManager.drawAll();
+    }
+
+    if (multiBallSlider && multiBallInput) {
+        multiBallSlider.addEventListener('input', (event) => {
+            multiBallInput.value = event.target.value;
+            updateMultiBallRadius(event.target.value);
+        });
+
+        multiBallInput.addEventListener('input', (event) => {
+            multiBallSlider.value = event.target.value;
+            updateMultiBallRadius(event.target.value);
+        });
+    }
+
+    function toggleMultiBallSliderVisibility() {
+        const hasMultiBall = hilbertBallManager.canvas.sites.some(site => site instanceof MultiBall);
+        multiBallContainer.style.display = hasMultiBall ? 'block' : 'none';
+    }
+
+    hilbertBallManager.toggleMultiBallSliderVisibility = toggleMultiBallSliderVisibility;
 }
 
 export function initShortcuts(hilbertBallManager) {
