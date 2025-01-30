@@ -17,62 +17,89 @@ function debounce(func, wait) {
     };
 }
 
+// Modified site-events.js
 export function initMouseActions(siteManager) {
-    const events = ['mousedown', 'mousemove', 'mouseup', 'click'];
-    const handlers = {
-        mousedown: (event) => {
-            if (event.shiftKey) {
-                siteManager.startDragSelect(event);
-            } else {
-                siteManager.startDragging(event);
-            }
-        },
-        mousemove: (event) => {
-            if (siteManager.isDragSelecting) {
-                siteManager.updateDragSelect(event);
-            } else {
-                siteManager.dragSite(event);
-                if (siteManager.hilbertDistanceManager.active) {
-                    siteManager.hilbertDistanceManager.updateSavedDistances();
-                }
-            }
-        },
-        mouseup: (event) => {
-            if (siteManager.isDragSelecting) {
-                siteManager.endDragSelect(event);
-            } else {
-                siteManager.stopDragging();
-            }
-        },
-        click: (event) => {
-            const { x, y } = siteManager.canvas.getMousePos(event);
-            const point = new Point(x, y);
-            if (siteManager.active) {
-                if (event.shiftKey) {
-                    siteManager.selectSite(event, true);
-                } else {
-                    siteManager.selectSite(event);
-                    siteManager.selectSegment(point);
-                }
-            }
-        },
+    const canvasElement = siteManager.canvas.canvas;
+    
+    // Remove existing listeners if any
+    if (siteManager._listenersAttached) {
+        destroyMouseActions(siteManager);
+    }
+
+    // Define handler methods directly on the manager
+    siteManager._mouseDownHandler = (event) => {
+        if (event.shiftKey) {
+            siteManager.startDragSelect(event);
+        } else {
+            siteManager.startDragging(event);
+        }
     };
 
-    events.forEach(eventType => {
-        siteManager.canvas.canvas.addEventListener(eventType, (event) => {
-            if (siteManager.active) {
-                handlers[eventType](event);
-            }
-        });
-    });
-
-    document.addEventListener('keydown', (event) => {
-        if (!isAnyModalOpen()) {
-            if (siteManager.active && (event.key === 'Delete' || event.key === 'Backspace')) {
-                siteManager.removeSelectedSegment();
+    siteManager._mouseMoveHandler = (event) => {
+        if (siteManager.isDragSelecting) {
+            siteManager.updateDragSelect(event);
+        } else {
+            siteManager.dragSite(event);
+            if (siteManager.hilbertDistanceManager.active) {
+                siteManager.hilbertDistanceManager.updateSavedDistances();
             }
         }
-    });
+    };
+
+    siteManager._mouseUpHandler = (event) => {
+        if (siteManager.isDragSelecting) {
+            siteManager.endDragSelect(event);
+        } else {
+            siteManager.stopDragging();
+        }
+    };
+
+    siteManager._clickHandler = (event) => {
+        const { x, y } = siteManager.canvas.getMousePos(event);
+        const point = new Point(x, y);
+        if (event.shiftKey) {
+            siteManager.selectSite(event, true);
+        } else {
+            siteManager.selectSite(event);
+            siteManager.selectSegment(point);
+        }
+    };
+
+    siteManager._keyDownHandler = (event) => {
+        if (!isAnyModalOpen() && (event.key === 'Delete' || event.key === 'Backspace')) {
+            siteManager.removeSelectedSegment();
+        }
+    };
+
+    // Add event listeners
+    canvasElement.addEventListener('mousedown', siteManager._mouseDownHandler);
+    canvasElement.addEventListener('mousemove', siteManager._mouseMoveHandler);
+    canvasElement.addEventListener('mouseup', siteManager._mouseUpHandler);
+    canvasElement.addEventListener('click', siteManager._clickHandler);
+    document.addEventListener('keydown', siteManager._keyDownHandler);
+
+    siteManager._listenersAttached = true;
+}
+
+export function destroyMouseActions(siteManager) {
+    const canvasElement = siteManager.canvas.canvas;
+    
+    if (siteManager._listenersAttached) {
+        canvasElement.removeEventListener('mousedown', siteManager._mouseDownHandler);
+        canvasElement.removeEventListener('mousemove', siteManager._mouseMoveHandler);
+        canvasElement.removeEventListener('mouseup', siteManager._mouseUpHandler);
+        canvasElement.removeEventListener('click', siteManager._clickHandler);
+        document.removeEventListener('keydown', siteManager._keyDownHandler);
+        
+        // Cleanup handler references
+        delete siteManager._mouseDownHandler;
+        delete siteManager._mouseMoveHandler;
+        delete siteManager._mouseUpHandler;
+        delete siteManager._clickHandler;
+        delete siteManager._keyDownHandler;
+        
+        siteManager._listenersAttached = false;
+    }
 }
 
 function getChangedProperties() {

@@ -157,7 +157,7 @@ export class HilbertDistanceManager {
             if (site1 && site2) {
                 return {
                     ...distance,
-                    value: hilbertDistance(site1, site2, this.canvas.polygon)
+                    value: hilbertDistance(site1, site2, site1.convexPolygon)
                 };
             } else {
                 // If one of the sites is deleted, keep the distance static

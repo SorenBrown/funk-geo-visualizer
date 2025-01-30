@@ -82,6 +82,11 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
             managers.forEach(manager => {
                 if (manager.name === 'SiteManager' || manager.name === 'HilbertDistanceManager') {
                     manager.activate();
+
+                    if (manager.name == 'SiteManager') {
+                        manager.hilbertDistanceManager.updateSavedDistances();
+                    }
+
                 } else {
                     manager.deactivate();
                 }
@@ -126,9 +131,16 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
             setDisplay(settingsLabel, 'none'); 
             setDisplay(multiBallRadiusContainer, 'none');
 
-            managers.forEach(manager => { manager.deactivate(); });
+            managers.forEach(manager => {
+                if (manager.name === 'SpaceManager') {
+                    manager.activate();
+                } else {
+                    manager.deactivate();
+                }
+            });
 
             canvas.activeManager = 'SpaceManager';
+            canvas.deselectAllSites();
         },
         'default': () => {
             setDisplay(siteCollapsible, 'none');

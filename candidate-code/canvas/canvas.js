@@ -37,6 +37,8 @@ export class Canvas {
         this.segments = [];
         this.bisectors = [];
         this.thompsonBisectors = [];
+
+        this.globalScale = 1.0;
     }
     
     setPolygonType(type) {
@@ -66,7 +68,7 @@ export class Canvas {
     createNgon(n) {
         const centerX = this.canvasWidth / 2.5;
         const centerY = this.canvasHeight / 1.8;
-        const radius = Math.min(this.canvasWidth, this.canvasHeight) * 0.9; // 40% of the smaller dimension
+        const radius = Math.min(this.canvasWidth, this.canvasHeight) * 0.5;
         
         this.polygon = new ConvexPolygon();
         
@@ -85,7 +87,19 @@ export class Canvas {
 
     getMousePos(event) {
         const rect = this.canvas.getBoundingClientRect();
-        return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+        const rawX = event.clientX - rect.left;
+        const rawY = event.clientY - rect.top;
+      
+        // Invert a transform of translate(cx, cy), scale, translate(-cx, -cy)
+        // Step 1: translate by (+cx, +cy):
+        let sceneX = rawX;
+        let sceneY = rawY;
+    
+        // Step 2: scale by (1/globalScale)
+        sceneX /= this.globalScale;
+        sceneY /= this.globalScale;
+      
+        return { x: sceneX, y: sceneY };
     }
 
     addPolygonPoint(event) {
@@ -177,8 +191,18 @@ export class Canvas {
         });
     }   
 
+    deselectAllSites() {
+        this.sites.forEach(site => {
+            site.setSelected(false);
+        });
+        this.drawAll();
+    }
+
     drawAll() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        this.ctx.save();
+        this.ctx.scale(this.globalScale, this.globalScale);
 
         this.polygon.draw(this.ctx);
 
@@ -203,6 +227,8 @@ export class Canvas {
         }); 
 
         this.drawSegments();
+
+        this.ctx.restore();
 
         /* ------------------------------------------------------------------------------------------------ */
 

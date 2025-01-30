@@ -1,42 +1,74 @@
-// // space-events.js
+// space-events.js
 
-// export function initMouseActions(manager) {
-//     let isDragging = false;
-//     let lastMousePos = null;
+import { pointInPolygon } from "../../default-functions.js";
+import { Point } from "../../default-objects.js";
 
-//     const canvasElement = manager.canvas.canvas;
 
-//     canvasElement.addEventListener('mousedown', (event) => {
-//         isDragging = true;
-//         lastMousePos = getMousePos(event, canvasElement);
-//         event.preventDefault(); // Prevent default behavior
-//     });
+export function initMouseActions(manager) {
+    let isDragging = false;
+    let mouseDownPos = null;
 
-//     canvasElement.addEventListener('mousemove', (event) => {
-//         if (isDragging) {
-//             const currentMousePos = getMousePos(event, canvasElement);
-//             const deltaX = currentMousePos.x - lastMousePos.x;
-//             const deltaY = currentMousePos.y - lastMousePos.y;
+    const canvasElement = manager.canvas.canvas;
+    const canvasObj = manager.canvas;
 
-//             manager.movePointsAlongGeodesics(deltaX, deltaY);
+    manager._mouseDownHandler = (event) => {
+        isDragging = true;
+        
+        const tempMouseDownPos = canvasObj.getMousePos(event);
+        if (pointInPolygon(tempMouseDownPos.x, tempMouseDownPos.y, manager.canvas.polygon)) {
+            mouseDownPos = tempMouseDownPos;
+            manager.storeOriginalGeometry();
+        } else {
+            mouseDownPos = null;
+        }
 
-//             lastMousePos = currentMousePos;
-//         }
-//     });
+        event.preventDefault();
+    };
 
-//     canvasElement.addEventListener('mouseup', () => {
-//         isDragging = false;
-//     });
+    manager._mouseMoveHandler = (event) => {
+        if (isDragging && mouseDownPos) {
+            const currentMousePos = canvasObj.getMousePos(event);
 
-//     canvasElement.addEventListener('mouseleave', () => {
-//         isDragging = false;
-//     });
-// }
+            const velocityVector = {
+                x: currentMousePos.x - mouseDownPos.x,
+                y: currentMousePos.y - mouseDownPos.y,
+            };
 
-// function getMousePos(event, canvasElement) {
-//     const rect = canvasElement.getBoundingClientRect();
-//     return {
-//         x: event.clientX - rect.left,
-//         y: event.clientY - rect.top
-//     };
-// }
+            manager.movePointsAlongGeodesics(velocityVector);
+        }
+    };
+
+    manager._mouseUpHandler = () => {
+        isDragging = false;
+    };
+
+    manager._mouseLeaveHandler = () => {
+        isDragging = false;
+    };
+
+    // Attach event listeners
+    canvasElement.addEventListener('mousedown', manager._mouseDownHandler);
+    canvasElement.addEventListener('mousemove', manager._mouseMoveHandler);
+    canvasElement.addEventListener('mouseup', manager._mouseUpHandler);
+    canvasElement.addEventListener('mouseleave', manager._mouseLeaveHandler);
+
+    manager._listenersAttached = true;
+}
+
+export function destroyMouseActions(manager) {
+    const canvasElement = manager.canvas.canvas;
+    
+    if (manager._listenersAttached) {
+        canvasElement.removeEventListener('mousedown', manager._mouseDownHandler);
+        canvasElement.removeEventListener('mousemove', manager._mouseMoveHandler);
+        canvasElement.removeEventListener('mouseup', manager._mouseUpHandler);
+        canvasElement.removeEventListener('mouseleave', manager._mouseLeaveHandler);
+
+        delete manager._mouseDownHandler;
+        delete manager._mouseMoveHandler;
+        delete manager._mouseUpHandler;
+        delete manager._mouseLeaveHandler;
+
+        manager._listenersAttached = false;
+    }
+}

@@ -4,7 +4,8 @@ import {
     initProperties, 
     initShortcuts, 
     initLabelInput,
-    initContextMenu
+    initContextMenu,
+    destroyMouseActions
 } from "./site-events.js";
 import { mouseOnSite, hidePiGradientBar } from "../../default-functions.js";
 
@@ -19,7 +20,9 @@ export class SiteManager {
         this.hilbertDistanceManager = hilbertDistanceManager;
         this.bisectorManager = bisectorManager;
         this.zRegionManager = zRegionManager;
-        initMouseActions(this);
+        
+        this._listenersAttached = false;
+
         initProperties(this);
         initShortcuts(this);
         initLabelInput(this);
@@ -166,15 +169,6 @@ export class SiteManager {
                     selectedSite.x = x;
                     selectedSite.y = y;
 
-                    // selectedSite.computeSpokes();
-                    
-                    // if (selectedSite instanceof HilbertBall) {
-                    //     // this.removeBallSegments(selectedSite);
-                    //     selectedSite.computeHilbertBall();
-                    // } else if (selectedSite instanceof MultiBall) {
-                    //     selectedSite.computeMultiBall();
-                    // }
-
                     if (selectedSite.infoBoxPosition) {
                         selectedSite.infoBoxPosition.left += deltaX * (rect.width / (this.canvas.canvas.width / this.canvas.dpr));
                         selectedSite.infoBoxPosition.top += deltaY * (rect.height / (this.canvas.canvas.height / this.canvas.dpr));
@@ -261,10 +255,12 @@ export class SiteManager {
 
     activate() {
         this.active = true;
+        initMouseActions(this);
     }
 
     deactivate() {
         this.active = false;
+        destroyMouseActions(this);
     }
 
     setPositionText(site) {
