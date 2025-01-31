@@ -12,6 +12,8 @@ export function initMouseActions(manager) {
 
     const canvasElement = manager.canvas.canvas;
     const canvasObj = manager.canvas;
+    let prevDisplacement = {x:0, y:0};
+    let displacement = null;
 
     manager._mouseDownHandler = (event) => {
         isDragging = true;
@@ -19,12 +21,12 @@ export function initMouseActions(manager) {
         if (mouseDownFirst) {
             mouseDownFirst = false;
             manager.storeOriginalOriginalGeometry();
+            manager.storeOriginalGeometry();
         }
         
         const tempMouseDownPos = canvasObj.getMousePos(event);
         if (pointInPolygon(tempMouseDownPos.x, tempMouseDownPos.y, manager.canvas.polygon)) {
             mouseDownPos = tempMouseDownPos;
-            manager.storeOriginalGeometry();
         } else {
             mouseDownPos = null;
         }
@@ -36,9 +38,14 @@ export function initMouseActions(manager) {
         if (isDragging && mouseDownPos) {
             const currentMousePos = canvasObj.getMousePos(event);
 
-            const velocityVector = {
+            displacement = {
                 x: currentMousePos.x - mouseDownPos.x,
                 y: currentMousePos.y - mouseDownPos.y,
+            };
+
+            const velocityVector = {
+                x: prevDisplacement.x + displacement.x,
+                y: prevDisplacement.y + displacement.y,
             };
 
             manager.movePointsAlongGeodesics(velocityVector);
@@ -47,13 +54,16 @@ export function initMouseActions(manager) {
 
     manager._mouseUpHandler = () => {
         isDragging = false;
+        prevDisplacement = {
+            x: prevDisplacement.x + displacement.x,
+            y: prevDisplacement.y + displacement.y
+        };
     };
 
     manager._mouseLeaveHandler = () => {
         isDragging = false;
     };
 
-    // Attach event listeners
     canvasElement.addEventListener('mousedown', manager._mouseDownHandler);
     canvasElement.addEventListener('mousemove', manager._mouseMoveHandler);
     canvasElement.addEventListener('mouseup', manager._mouseUpHandler);
