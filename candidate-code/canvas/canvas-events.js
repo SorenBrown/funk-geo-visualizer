@@ -17,6 +17,10 @@ export function initEvents(canvas) {
     document.getElementById('polygonShowDiag').addEventListener('change', (event) => {
       canvas.setPolygonShowDiagonals(event);
     });
+
+    document.getElementById('polygonShowCentroid').addEventListener('change', (event) => {
+      canvas.setPolygonShowCentroid(event);
+    });
   
     document.getElementById('modeSwitch').addEventListener('change', (event) => {
       canvas.mode = event.target.checked ? 'Hilbert' : 'Convex';

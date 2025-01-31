@@ -8,11 +8,18 @@ export function initMouseActions(manager) {
     let isDragging = false;
     let mouseDownPos = null;
 
+    let mouseDownFirst = true;
+
     const canvasElement = manager.canvas.canvas;
     const canvasObj = manager.canvas;
 
     manager._mouseDownHandler = (event) => {
         isDragging = true;
+
+        if (mouseDownFirst) {
+            mouseDownFirst = false;
+            manager.storeOriginalOriginalGeometry();
+        }
         
         const tempMouseDownPos = canvasObj.getMousePos(event);
         if (pointInPolygon(tempMouseDownPos.x, tempMouseDownPos.y, manager.canvas.polygon)) {

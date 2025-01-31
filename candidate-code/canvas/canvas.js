@@ -1,6 +1,6 @@
 // canvas/canvas.js
-import { ConvexPolygon, Point, SelectableSegment, HilbertBall } from "../../default-objects.js";
-import { drawInfoBox, clearInfoBoxes, renderAllKaTeX, hidePiGradientBar, createPiMap, createScatterPlot } from "../../default-functions.js";
+import { ConvexPolygon, Point, SelectableSegment, HilbertBall,Site } from "../../default-objects.js";
+import { drawInfoBox, clearInfoBoxes, renderAllKaTeX, hidePiGradientBar, createPiMap, createScatterPlot, centroid } from "../../default-functions.js";
 import { initEvents } from "./canvas-events.js";
 
 export class Canvas {
@@ -32,6 +32,7 @@ export class Canvas {
         this.createCustomNgonButton = document.getElementById('createCustomNgon');
 
         this.ngonVertices = [];
+
         this.sites = [];
         this.selectionOrder = [];
         this.segments = [];
@@ -39,6 +40,8 @@ export class Canvas {
         this.thompsonBisectors = [];
 
         this.globalScale = 1.0;
+
+        this.showCentroid = false;
     }
     
     setPolygonType(type) {
@@ -90,12 +93,10 @@ export class Canvas {
         const rawX = event.clientX - rect.left;
         const rawY = event.clientY - rect.top;
       
-        // Invert a transform of translate(cx, cy), scale, translate(-cx, -cy)
-        // Step 1: translate by (+cx, +cy):
+
         let sceneX = rawX;
         let sceneY = rawY;
     
-        // Step 2: scale by (1/globalScale)
         sceneX /= this.globalScale;
         sceneY /= this.globalScale;
       
@@ -130,6 +131,11 @@ export class Canvas {
 
     setPolygonShowInfo(event) {
         this.polygon.setShowInfo(event.target.checked);
+        this.drawAll();
+    }
+
+    setPolygonShowCentroid() {
+        this.showCentroid = true;
         this.drawAll();
     }
 
@@ -199,6 +205,7 @@ export class Canvas {
     }
 
     drawAll() {
+
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         this.ctx.save();
@@ -228,6 +235,11 @@ export class Canvas {
 
         this.drawSegments();
 
+        if (this.polygon && this.showCentroid) {
+            this.centroid = centroid(this.polygon.vertices);
+            this.drawXMarker(this.centroid, 'red', 10);
+        }
+
         this.ctx.restore();
 
         /* ------------------------------------------------------------------------------------------------ */
@@ -243,6 +255,30 @@ export class Canvas {
         this.sites.forEach(site => { if (site.showInfo) drawInfoBox(site, this.canvas, this.dpr); });
 
         renderAllKaTeX();
+    }
+
+    drawXMarker(point, color = 'red', size = 10) {
+        if (!point) return; 
+    
+        const ctx = this.ctx;
+        ctx.save();
+    
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+    
+        const x1 = point.x - size / 2;
+        const x2 = point.x + size / 2;
+        const y1 = point.y - size / 2;
+        const y2 = point.y + size / 2;
+    
+        ctx.beginPath();
+        ctx.moveTo(x1, y1); 
+        ctx.lineTo(x2, y2);
+        ctx.moveTo(x1, y2);
+        ctx.lineTo(x2, y1);
+        ctx.stroke();
+    
+        ctx.restore();
     }
 
     resetCanvas() {
@@ -265,3 +301,4 @@ export class Canvas {
         this.drawAll();
     }
 }
+
