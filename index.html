@@ -166,7 +166,7 @@
     </div>
 
       <label id="general-settings" class="select-program" style="margin-bottom: 20px; margin-top: 25px; font-size: 16px;">Settings</label>
-      
+
       <div id="multiBallRadiusContainer" style="display: none;">
         <div id="multiBallRadiusWrapper">
             <label for="multiBallRadius">Multi Ball Radius</label>
@@ -384,9 +384,13 @@
   <div class="context-menu-item" id="drawMERB">Draw Hilbert Minimum Enclosing Radius Ball</div> -->
 </div>
 
+<!-- Snowy Switch -->
+<button id="spriteModeButton">Sprite Mode</button>
+<button id="toggleAsteroidsButton" style="display: none;">Turn Off Asteroids</button>
 
 <!---------------------------------- STAGE -------------------------------->
 <script type="module" src="./candidate-code/scripts/scripts.js" defer></script>
+<script type="module" src="./candidate-code/space/sprite.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/10.0.0/math.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf/turf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/nerdamer@latest/nerdamer.core.js"></script>

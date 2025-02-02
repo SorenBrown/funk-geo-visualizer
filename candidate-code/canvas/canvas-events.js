@@ -75,18 +75,4 @@ export function initEvents(canvas) {
       } 
     });
 
-    canvas.canvas.addEventListener("wheel", (event) => {
-        event.preventDefault();
-
-        const zoomFactor = 1.01; 
-        if (event.deltaY < 0) {
-            canvas.globalScale *= zoomFactor;
-        } else {
-            canvas.globalScale /= zoomFactor;
-        }
-
-        canvas.globalScale = Math.max(0.1, Math.min(canvas.globalScale, 10));
-
-        canvas.drawAll();
-    }, { passive: false });
   }

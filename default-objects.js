@@ -26,7 +26,8 @@ import {
   getPointsOnForwardFunkBall,
   getPointsOnReverseFunkBall,
   create3DPiLengthPlot,
-  perturbPolygon
+  perturbPolygon,
+  randomPointInsidePolygon
 } from './default-functions.js';
 
 export class Point {
@@ -39,6 +40,7 @@ export class Point {
         this.showInfo = showInfo;
         this.infoBoxPosition = null; // Add this line
         this.defaultInfoBoxPosition = null;
+        this.drawPoint = true;
     }
 
     isOn(segment) {
@@ -70,11 +72,17 @@ export class Point {
       ctx.stroke();
     }
 
+    setDraw(draw) {
+      this.drawPoint = draw;
+    }
+
     draw(ctx) {
-      ctx.fillStyle = this.color;
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-      ctx.fill();
+      if (this.drawPoint) {
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+        ctx.fill();
+      }
     }
 
     drawWithRing(ctx, ringColor = "red", ringRadius = 8) {
@@ -521,7 +529,7 @@ export class ConvexPolygon {
       }
     }
 
-    fill(ctx, fillColor = 'rgba(0, 0, 0, 0.5)') {
+    fill(ctx, fillColor = 'black') {
       if (this.vertices.length > 0) {
           ctx.fillStyle = this.fillColor ? this.fillColor : fillColor;
           ctx.beginPath();
@@ -544,6 +552,8 @@ export class HilbertBall extends Site {
       this.boundaryColor = boundaryColor;
       this.polygon = new ConvexPolygon(this.pointsOnBall, this.boundaryColor, penWidth);
       this.polarBody = getPolarBody(this.polygon, this);
+      this.textureEnabled = false;
+
   }
 
   setBoundaryColor(color) { 
@@ -595,8 +605,39 @@ export class HilbertBall extends Site {
     return maxL;
   }
 
+  setTextureEnabled(enabled) {
+    this.textureEnabled = enabled;
+  }
+
   draw(ctx) {
-      this.polygon.setShowVertices(false);
+    this.polygon.setShowVertices(false);
+
+    if (this.textureEnabled) {
+      ctx.save();
+
+      const center = centroid(this.pointsOnBall);
+
+      const grad = ctx.createRadialGradient(
+        center.x, center.y, this.ballRadius * 0.5,
+        center.x, center.y, this.ballRadius
+      );
+      grad.addColorStop(0, "#ddd");    
+      grad.addColorStop(0.7, "#ccc");    
+      grad.addColorStop(1, "#bbb");      
+
+      ctx.fillStyle = grad;
+      ctx.shadowColor = "rgba(0, 0, 0, 0.3)";
+      ctx.shadowBlur = 5;
+
+      this.polygon.fill(ctx, grad);
+
+      ctx.strokeStyle = "#999";
+      ctx.lineWidth = 2;
+      this.polygon.draw(ctx);
+
+      ctx.restore();
+    } else {
+      
 
       if (this.showInfo) {
           super.setShowInfo(true);
@@ -623,13 +664,13 @@ export class HilbertBall extends Site {
           let p2 = this.pointsOnBall[(i+1) % this.pointsOnBall.length];
           let intersections = this.convexPolygon.intersectWithLine(new Segment(p1, p2));
           if (intersections.length == 2) {
-            // Generate a unique color for each line
-            let hue = (i * 137.5) % 360; // Use golden angle approximation for color distribution
+            let hue = (i * 137.5) % 360; 
             let color = `hsl(${hue}, 70%, 50%)`;
             new Segment(intersections[0], intersections[1], color).draw(ctx);
           }
         }
       }
+    }
   }
 }
 
@@ -1417,5 +1458,20 @@ export class ThompsonBisector {
   
   draw(ctx) {
     this.points.forEach(pt => pt.draw(ctx));  
+  }
+}
+
+export class Star {
+  constructor(x, y, radius = 2) {
+      this.x = x;
+      this.y = y;
+      this.radius = radius;
+  }
+
+  draw(ctx) {
+      ctx.fillStyle = "white";
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+      ctx.fill();
   }
 }

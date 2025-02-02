@@ -16,26 +16,28 @@ export function initMouseActions(manager) {
     let displacement = null;
 
     manager._mouseDownHandler = (event) => {
-        isDragging = true;
+        if (!canvasObj.spriteMode) {
+            isDragging = true;
 
-        if (mouseDownFirst) {
-            mouseDownFirst = false;
-            manager.storeOriginalOriginalGeometry();
-            manager.storeOriginalGeometry();
-        }
-        
-        const tempMouseDownPos = canvasObj.getMousePos(event);
-        if (pointInPolygon(tempMouseDownPos.x, tempMouseDownPos.y, manager.canvas.polygon)) {
-            mouseDownPos = tempMouseDownPos;
-        } else {
-            mouseDownPos = null;
-        }
+            if (mouseDownFirst) {
+                mouseDownFirst = false;
+                manager.storeOriginalOriginalGeometry();
+                manager.storeOriginalGeometry();
+            }
+            
+            const tempMouseDownPos = canvasObj.getMousePos(event);
+            if (pointInPolygon(tempMouseDownPos.x, tempMouseDownPos.y, manager.canvas.polygon)) {
+                mouseDownPos = tempMouseDownPos;
+            } else {
+                mouseDownPos = null;
+            }
 
-        event.preventDefault();
+            event.preventDefault();
+        }
     };
 
     manager._mouseMoveHandler = (event) => {
-        if (isDragging && mouseDownPos) {
+        if (isDragging && mouseDownPos && !canvasObj.spriteMode) {
             const currentMousePos = canvasObj.getMousePos(event);
 
             displacement = {
@@ -48,20 +50,22 @@ export function initMouseActions(manager) {
                 y: prevDisplacement.y + displacement.y,
             };
 
-            manager.movePointsAlongGeodesics(velocityVector);
+            manager.projectPoints(velocityVector);
         }
     };
 
     manager._mouseUpHandler = () => {
-        isDragging = false;
-        prevDisplacement = {
-            x: prevDisplacement.x + displacement.x,
-            y: prevDisplacement.y + displacement.y
-        };
+        if (!canvasObj.spriteMode) {
+            isDragging = false;
+            prevDisplacement = {
+                x: prevDisplacement.x + displacement.x,
+                y: prevDisplacement.y + displacement.y
+            };
+        }
     };
 
     manager._mouseLeaveHandler = () => {
-        isDragging = false;
+        if (!canvasObj.spriteMode) isDragging = false;
     };
 
     canvasElement.addEventListener('mousedown', manager._mouseDownHandler);

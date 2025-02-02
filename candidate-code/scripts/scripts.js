@@ -4,6 +4,7 @@ import { HilbertBallManager } from "../hilbert-ball/hilbert-ball.js";
 import { BisectorManager } from "../bisector/bisector.js";
 import { HilbertDistanceManager } from "../hilbert-distance/hilbert-distance.js";
 import { SpaceManager } from "../space/space.js";
+
 import { 
     initializeDropdowns, 
     initializeAddSiteListener, 
@@ -37,3 +38,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeAddSiteListener(canvasElement, managers, canvas);
     initializeJsonHandlers(canvas, hilbertDistanceManager, managers);
 });
+
+export { canvas, spaceManager };

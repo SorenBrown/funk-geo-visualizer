@@ -2,6 +2,7 @@
 import { ConvexPolygon, Point, SelectableSegment, HilbertBall,Site } from "../../default-objects.js";
 import { drawInfoBox, clearInfoBoxes, renderAllKaTeX, hidePiGradientBar, createPiMap, createScatterPlot, centroid } from "../../default-functions.js";
 import { initEvents } from "./canvas-events.js";
+import { flameIntensity } from "../space/sprite.js";
 
 export class Canvas {
     constructor(canvasElement) {
@@ -42,6 +43,14 @@ export class Canvas {
         this.globalScale = 1.0;
 
         this.showCentroid = false;
+        
+        this.spriteMode = false;
+        this.stars = [];
+        this.asteroids = [];
+        this.sprite = null;
+        
+        this.showAsteroids = true;
+
     }
     
     setPolygonType(type) {
@@ -71,7 +80,7 @@ export class Canvas {
     createNgon(n) {
         const centerX = this.canvasWidth / 2.5;
         const centerY = this.canvasHeight / 1.8;
-        const radius = Math.min(this.canvasWidth, this.canvasHeight) * 0.5;
+        const radius = Math.min(this.canvasWidth, this.canvasHeight) * 1.05 ;
         
         this.polygon = new ConvexPolygon();
         
@@ -204,57 +213,168 @@ export class Canvas {
         this.drawAll();
     }
 
+    drawTeardropFlame(
+        ctx,
+        x,
+        y,
+        rotation,
+        flameHeight,
+        topWidth,
+        bottomWidth,
+        flickerStrength = 0,
+        colorStart = "white",
+        colorMiddle = "lightblue",
+        colorEnd = "transparent"
+      ) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(rotation);
+      
+        const rocketHalfHeight = 40;
+        ctx.translate(0, rocketHalfHeight);
+      
+        const flicker = (Math.random() - 0.5) * flickerStrength;
+      
+        const gradient = ctx.createLinearGradient(
+          0,
+          0,
+          0,
+          flameHeight + flicker
+        );
+        gradient.addColorStop(0, colorStart);   
+        gradient.addColorStop(0.5, colorMiddle);  
+        gradient.addColorStop(1, colorEnd);     
+      
+        ctx.shadowColor = "rgba(63, 182, 255, 0.5)";
+        ctx.shadowBlur = 20;                   
+      
+        ctx.fillStyle = gradient;
+      
+
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+      
+        ctx.bezierCurveTo(
+          -bottomWidth * 0.5, flameHeight * 0.3, 
+          -bottomWidth * 0.5, flameHeight * 0.7, 
+          0, flameHeight + flicker              
+        );
+      
+        ctx.bezierCurveTo(
+          bottomWidth * 0.5, flameHeight * 0.7,  
+          bottomWidth * 0.5, flameHeight * 0.3,  
+          0, 0                                   
+        );
+        ctx.closePath();
+      
+        const scaleX = topWidth / bottomWidth;
+        ctx.save();
+        ctx.scale(scaleX, 1);
+        ctx.fill();
+        ctx.restore();
+      
+        ctx.restore();
+      }
+
+    drawSprite(ctx) {
+        if (!this.spriteMode || !this.sprite) return;
+    
+        const { x, y, rotation, image } = this.sprite;
+        const width = 50;
+        const height = 80;
+    
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(rotation);
+        ctx.drawImage(image, -width / 2, -height / 2, width, height);
+        ctx.shadowColor = "rgba(255, 200, 0, 0.8)";
+        ctx.shadowBlur = 20;
+        ctx.restore();
+    }
+
     drawAll() {
 
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        this.ctx.save();
-        this.ctx.scale(this.globalScale, this.globalScale);
-
         this.polygon.draw(this.ctx);
-
-        this.thompsonBisectors = this.thompsonBisectors.filter(thompBobj => {
-            if (this.sites.includes(thompBobj.site1) && this.sites.includes(thompBobj.site2)) {
-                thompBobj.draw(this.ctx);
-                return true;
-            }
-            return false;
-        })
-
-        this.sites.forEach(site => {
-            site.computeSpokes();
-            site.computeHilbertBall?.();
-            site.computeMultiBall?.();
-            site.draw(this.ctx);
-        });
-
-        this.bisectors.forEach(bisector => {
-            bisector.computeBisector(bisector.s1, bisector.s2);
-            bisector.draw(this.ctx);
-        }); 
-
-        this.drawSegments();
-
-        if (this.polygon && this.showCentroid) {
-            this.centroid = centroid(this.polygon.vertices);
-            this.drawXMarker(this.centroid, 'red', 10);
-        }
-
-        this.ctx.restore();
-
-        /* ------------------------------------------------------------------------------------------------ */
-
-        clearInfoBoxes();
-
-        if (this.polygon.showInfo) {
-            this.polygon.vertices.forEach(vertex => {
-                if (vertex.showInfo) drawInfoBox(vertex, this.canvas, this.dpr);
+        
+    
+        if (this.spriteMode) {
+            
+            this.polygon.fill(this.ctx);
+            this.stars.forEach(star => {
+                if (this.polygon.contains({ x: star.x, y: star.y })) {
+                    star.draw(this.ctx);
+                }
             });
+            if (this.showAsteroids) {
+                this.asteroids.forEach(asteroid => {
+                    asteroid.setDraw(false);
+                    asteroid.setTextureEnabled(true);
+                    asteroid.draw(this.ctx);
+                });
+            }
+            
+            this.drawSprite(this.ctx);
+            
+            if (flameIntensity > 0.01) {
+                this.drawTeardropFlame(
+                    this.ctx,
+                    this.sprite.x,
+                    this.sprite.y,
+                    this.sprite.rotation,
+                    40 * flameIntensity,      
+                    10 * flameIntensity, 
+                    20 * flameIntensity, 
+                    10 * flameIntensity,
+                    "white",
+                    "lightblue",
+                    "transparent"
+                );
+            }
+            
+        } else {    
+            this.thompsonBisectors = this.thompsonBisectors.filter(thompBobj => {
+                if (this.sites.includes(thompBobj.site1) && this.sites.includes(thompBobj.site2)) {
+                    thompBobj.draw(this.ctx);
+                    return true;
+                }
+                return false;
+            })
+    
+            this.sites.forEach(site => {
+                site.computeSpokes();
+                site.computeHilbertBall?.();
+                site.computeMultiBall?.();
+                site.draw(this.ctx);
+            });
+    
+            this.bisectors.forEach(bisector => {
+                bisector.computeBisector(bisector.s1, bisector.s2);
+                bisector.draw(this.ctx);
+            }); 
+    
+            this.drawSegments();
+    
+            if (this.polygon && this.showCentroid) {
+                this.centroid = centroid(this.polygon.vertices);
+                this.drawXMarker(this.centroid, 'red', 10);
+            }
+    
+            clearInfoBoxes();
+    
+            if (this.polygon.showInfo) {
+                this.polygon.vertices.forEach(vertex => {
+                    if (vertex.showInfo) drawInfoBox(vertex, this.canvas, this.dpr);
+                });
+            }
+    
+            this.sites.forEach(site => { if (site.showInfo) drawInfoBox(site, this.canvas, this.dpr); });
+    
+            renderAllKaTeX();
         }
 
-        this.sites.forEach(site => { if (site.showInfo) drawInfoBox(site, this.canvas, this.dpr); });
-
-        renderAllKaTeX();
+        
     }
 
     drawXMarker(point, color = 'red', size = 10) {

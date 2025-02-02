@@ -127,6 +127,13 @@ export class SpaceManager extends SiteManager {
                 y: (site.y - yMid) * scale
             };
         });
+
+        this._normOriginalAsteroids = this.canvas.asteroids.map(site => {
+            return {
+                x: (site.x - xMid) * scale,
+                y: (site.y - yMid) * scale
+            };
+        });
     }
 
     storeOriginalOriginalGeometry() {
@@ -135,10 +142,10 @@ export class SpaceManager extends SiteManager {
     }
 
     
-    movePointsAlongGeodesics(v) {
+    projectPoints(v) {
         if (!this._normInfo || !this._origCircle) return;
 
-        const velocityFactor = 0.002;
+        const velocityFactor = 0.0005;
         const scaledV = {
             x: v.x * velocityFactor,
             y: v.y * velocityFactor
@@ -155,6 +162,10 @@ export class SpaceManager extends SiteManager {
         });
 
         const newSitePositions = this._normOriginalSites.map(siteNorm => {
+            return projectPointWithCenter(siteNorm, scaledV, centerNorm);
+        }).map(pt => unNormalizePoint(pt, this._normInfo));
+
+        const newAsteroidPositions = this._normOriginalAsteroids.map(siteNorm => {
             return projectPointWithCenter(siteNorm, scaledV, centerNorm);
         }).map(pt => unNormalizePoint(pt, this._normInfo));
 
@@ -183,6 +194,18 @@ export class SpaceManager extends SiteManager {
                 this.canvas.sites[i].x = mappedPt.x;
                 this.canvas.sites[i].y = mappedPt.y;
             }
+            
+            for (let i = 0; i < this.canvas.asteroids.length; i++) {
+                const oldPt = newAsteroidPositions[i];
+                const mappedPt = mapCircleToCircle(
+                    oldPt,
+                    newCircle.center, newCircle.radius,
+                    this._origCircle.center, this._origCircle.radius
+                );
+
+                this.canvas.asteroids[i].x = mappedPt.x;
+                this.canvas.asteroids[i].y = mappedPt.y;
+            }
 
             const currPolygon = this.canvas.polygon;
             const newPolygon = new ConvexPolygon(
@@ -203,6 +226,18 @@ export class SpaceManager extends SiteManager {
                     s.computeSpokes?.();
                     s.computeHilbertBall?.();
                     s.computeMultiBall?.();
+                }
+            }
+
+
+            if (this.canvas.showAsteroids) {
+                for (let i = 0; i < this.canvas.asteroids.length; i++) {
+                    const s = this.canvas.asteroids[i];
+                    if (pointInPolygon(s.x, s.y, newPolygon)) {
+                        s.convexPolygon = newPolygon;
+                        s.computeSpokes?.();
+                        s.computeHilbertBall?.();
+                    }
                 }
             }
         }

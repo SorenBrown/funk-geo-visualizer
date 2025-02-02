@@ -12,6 +12,24 @@ import {
   MinimumEnclosingHilbertBall
 } from './default-objects.js';
 
+export function randomPointInsidePolygon(polygon) {
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  polygon.vertices.forEach(v => {
+    if (v.x < minX) minX = v.x;
+    if (v.x > maxX) maxX = v.x;
+    if (v.y < minY) minY = v.y;
+    if (v.y > maxY) maxY = v.y;
+  });
+
+  while (true) {
+    const x = minX + Math.random() * (maxX - minX);
+    const y = minY + Math.random() * (maxY - minY);
+    if (polygon.contains({ x, y })) {
+      return { x, y };
+    }
+  }
+}
+
 export function pointInPolygon(x, y, polygon) {
   const point = new Point(x, y);
   return polygon.contains(point);
