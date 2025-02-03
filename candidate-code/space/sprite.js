@@ -48,7 +48,7 @@ function updateStarsPositions(dx, dy) {
     const canvasEl = document.getElementById("canvas");
     const width = canvasEl.width;
     const height = canvasEl.height;
-    const parallaxFactor = 50;
+    const parallaxFactor = 30;
   
     canvas.stars.forEach(star => {
       star.x += dx * parallaxFactor;
@@ -190,7 +190,7 @@ function updateSpriteToCentroid() {
     sprite.y = center.y;
 }
   
-let spriteSpeed = 0.003; 
+let spriteSpeed = 0.04; 
 let isMoving = false;
 let keysPressed = {};
 
