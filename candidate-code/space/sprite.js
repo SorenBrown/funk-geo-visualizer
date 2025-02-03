@@ -190,7 +190,7 @@ function updateSpriteToCentroid() {
     sprite.y = center.y;
 }
   
-let spriteSpeed = 0.04; 
+let spriteSpeed = 0.001; 
 let isMoving = false;
 let keysPressed = {};
 
