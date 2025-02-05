@@ -49,7 +49,7 @@ export class Canvas {
         this.asteroids = [];
         this.sprite = null;
         
-        this.showAsteroids = true;
+        this.showAsteroids = false;
 
     }
     

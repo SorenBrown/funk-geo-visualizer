@@ -92,13 +92,16 @@ function computeJohnEllipsoid(points) {
 
 // Credit: https://www.mathworks.com/matlabcentral/answers/566250-how-to-transform-a-ellipse-to-circle
 function mapJohnToUnitCircle(point, ellipsoid) {
-    const B = ellipsoid.matrix.cholesky();
+    // y = L(x-c)
+    const L = ellipsoid.matrix.cholesky();
     const diff = new Point(point.x - ellipsoid.center.x, point.y - ellipsoid.center.y);
-    return B.apply(diff);
+    return L.apply(diff);
 }
 
 function mapUnitCircleToJohn(y, ellipsoid) {
-    const mappedDifference = ellipsoid.matrix.cholesky().inv().apply(y);
+    // x = L^{-1}y + c
+    const L = ellipsoid.matrix.cholesky();
+    const mappedDifference = L.inv().apply(y);
     const a = mappedDifference.x + ellipsoid.center.x;
     const b = mappedDifference.y + ellipsoid.center.y;
     return new Point(a,b);
