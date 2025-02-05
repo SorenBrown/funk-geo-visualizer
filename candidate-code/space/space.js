@@ -173,7 +173,7 @@ export class SpaceManager extends SiteManager {
     projectPoints(v) {
         if (!this._normInfo || !this._origJohn) return;
 
-        const velocityFactor = 0.0005;
+        const velocityFactor = 0.005;
         const scaledV = { x: v.x * velocityFactor, y: v.y * velocityFactor };
 
         const centerNorm = centroid(this._normOriginalPolygonVertices);
