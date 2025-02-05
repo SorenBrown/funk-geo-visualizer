@@ -5,79 +5,105 @@ import { ConvexPolygon, Point } from "../../default-objects.js";
 import { centroid, pointInPolygon } from "../../default-functions.js";
 import { initMouseActions, destroyMouseActions } from "./space-events.js";
 
+// Class for a 2d matrix
+class Matrix {
+    constructor(matrix) {
+        this.matrix = matrix;
+    }
 
-function minimumEnclosingCircle(points) {
+    apply(point) {
+        const x = this.matrix[0][0] * point.x + this.matrix[0][1] * point.y;
+        const y = this.matrix[1][0] * point.x + this.matrix[1][1] * point.y;
+        return new Point(x, y);
+    }
 
-    const shuffled = [...points];
-    shuffled.sort(() => Math.random() - 0.5);
+    inv() {
+        let A = this.matrix;
+        const det = A[0][0] * A[1][1] - A[0][1] * A[1][0];
+        return new Matrix([
+            [A[1][1] / det, -A[0][1] / det],
+            [-A[1][0] / det, A[0][0] / det]
+        ]);
+    } 
 
-    let c = { center: new Point(0, 0), radius: 0 };
+    // cholesky factorization: https://www.geeksforgeeks.org/cholesky-factorization/
+    cholesky() {
+        let A = this.matrix;
+        const L = [[0, 0], [0, 0]];
+        L[0][0] = Math.sqrt(A[0][0]);
+        L[1][0] = A[1][0] / L[0][0];
+        L[1][1] = Math.sqrt(A[1][1] - L[1][0] * L[1][0]);
+        return new Matrix(L);
+    }
+}
 
-    for (let i = 0; i < shuffled.length; i++) {
-        if (!isInCircle(c, shuffled[i])) {
-            c = { center: shuffled[i], radius: 0 };
-            for (let j = 0; j < i; j++) {
-                if (!isInCircle(c, shuffled[j])) {
-                    c = circleWithTwoPoints(shuffled[i], shuffled[j]);
-                    for (let k = 0; k < j; k++) {
-                        if (!isInCircle(c, shuffled[k])) {
-                            c = circleWithThreePoints(shuffled[i], shuffled[j], shuffled[k]);
-                        }
-                    }
-                }
-            }
+// Algorithms for ellipsoids: https://tcg.mae.cornell.edu/pubs/Pope_FDA_08.pdf
+function computeJohnEllipsoid(points) {
+    // Find the centroid of the polygon.
+    let centroid_ = centroid(points);
+    const cx = centroid_.x;
+    const cy = centroid_.y;
+
+    // Find the Covariance matrix
+    let covarianceMatrix = new Matrix([
+        [0, 0], // Sxx, Sxy
+        [0, 0]  // Sxy, Syy
+    ]);
+    for (let point of points) {
+        covarianceMatrix.matrix[0][0] += (point.x - cx) * (point.x - cx);
+        covarianceMatrix.matrix[0][1] += (point.x - cx) * (point.y - cy);
+        covarianceMatrix.matrix[1][0] += (point.y - cy) * (point.x - cx);
+        covarianceMatrix.matrix[1][1] += (point.y - cy) * (point.y - cy);
+    }
+
+    covarianceMatrix.matrix[0][0] /= points.length;
+    covarianceMatrix.matrix[0][1] /= points.length;   
+    covarianceMatrix.matrix[1][0] /= points.length;
+    covarianceMatrix.matrix[1][1] /= points.length;
+
+    
+    // Find the inverse covariance matrix
+    let inverseCovarianceMatrix = covarianceMatrix.inv().matrix;
+
+    // mahanobolis distance: https://math.stackexchange.com/questions/428064/distance-of-a-test-point-from-the-center-of-an-ellipsoid
+    // Find the Scaling factor - take the point furthest away from the centroid
+    let scalingFactor = 0;
+    for (let point of points) {
+        // mahalanobis distance
+        let x = point.x - cx;
+        let y = point.y - cy;
+        let dist = (x**2) * inverseCovarianceMatrix[0][0] + 2 * x * y * inverseCovarianceMatrix[0][1] + (y ** 2) * inverseCovarianceMatrix[1][1];
+        if (dist > scalingFactor) {
+            scalingFactor = dist;
         }
     }
-    return c;
+
+    inverseCovarianceMatrix[0][0] /= scalingFactor;
+    inverseCovarianceMatrix[0][1] /= scalingFactor; 
+    inverseCovarianceMatrix[1][0] /= scalingFactor; 
+    inverseCovarianceMatrix[1][1] /= scalingFactor; 
+
+    return {
+        center: new Point(cx, cy),
+        matrix: new Matrix(inverseCovarianceMatrix)
+    };
+    
 }
 
-function isInCircle(circle, p) {
-    const dx = circle.center.x - p.x;
-    const dy = circle.center.y - p.y;
-    return dx * dx + dy * dy <= circle.radius * circle.radius + 1e-12;
+// Credit: https://www.mathworks.com/matlabcentral/answers/566250-how-to-transform-a-ellipse-to-circle
+function mapJohnToUnitCircle(point, ellipsoid) {
+    const B = ellipsoid.matrix.cholesky();
+    const diff = new Point(point.x - ellipsoid.center.x, point.y - ellipsoid.center.y);
+    return B.apply(diff);
 }
 
-function circleWithTwoPoints(a, b) {
-    const cx = (a.x + b.x) / 2;
-    const cy = (a.y + b.y) / 2;
-    const r = distance(a, b) / 2;
-    return { center: new Point(cx, cy), radius: r };
+function mapUnitCircleToJohn(y, ellipsoid) {
+    const mappedDifference = ellipsoid.matrix.cholesky().inv().apply(y);
+    const a = mappedDifference.x + ellipsoid.center.x;
+    const b = mappedDifference.y + ellipsoid.center.y;
+    return new Point(a,b);
 }
 
-function circleWithThreePoints(a, b, c) {
-
-    const A = b.x - a.x;
-    const B = b.y - a.y;
-    const C = c.x - a.x;
-    const D = c.y - a.y;
-    const E = A * (a.x + b.x) + B * (a.y + b.y);
-    const F = C * (a.x + c.x) + D * (a.y + c.y);
-    const G = 2 * (A * (c.y - b.y) - B * (c.x - b.x));
-
-    if (Math.abs(G) < 1e-12) {
-        const cAB = circleWithTwoPoints(a, b);
-        const cAC = circleWithTwoPoints(a, c);
-        const cBC = circleWithTwoPoints(b, c);
-        let candidates = [cAB, cAC, cBC];
-        candidates = candidates.filter((circ) =>
-            isInCircle(circ, a) && isInCircle(circ, b) && isInCircle(circ, c)
-        );
-        candidates.sort((c1, c2) => c1.radius - c2.radius);
-        return candidates[0] || cAB;
-    } else {
-        const cx = (D * E - B * F) / G;
-        const cy = (A * F - C * E) / G;
-        const center = new Point(cx, cy);
-        const r = distance(center, a);
-        return { center, radius: r };
-    }
-}
-
-function distance(p1, p2) {
-    const dx = p1.x - p2.x;
-    const dy = p1.y - p2.y;
-    return Math.sqrt(dx * dx + dy * dy);
-}
 
 export class SpaceManager extends SiteManager {
     constructor(canvas) {
@@ -89,7 +115,7 @@ export class SpaceManager extends SiteManager {
         this._normOriginalSites = [];
         this._normInfo = null;
 
-        this._origCircle = null;
+        this._origJohn = null;
     }
 
     storeOriginalGeometry() {
@@ -137,107 +163,54 @@ export class SpaceManager extends SiteManager {
     }
 
     storeOriginalOriginalGeometry() {
-        const vertices = this.canvas.polygon.vertices;
-        this._origCircle = minimumEnclosingCircle(vertices);
+        this._origJohn = computeJohnEllipsoid(this.canvas.polygon.vertices);
     }
 
     
     projectPoints(v) {
-        if (!this._normInfo || !this._origCircle) return;
+        if (!this._normInfo || !this._origJohn) return;
 
-        const velocityFactor = 0.0005;
-        const scaledV = {
-            x: v.x * velocityFactor,
-            y: v.y * velocityFactor
-        };
+        const velocityFactor = 0.005;
+        const scaledV = { x: v.x * velocityFactor, y: v.y * velocityFactor };
 
         const centerNorm = centroid(this._normOriginalPolygonVertices);
+        const projectedVertices = this._normOriginalPolygonVertices.map(vertex => { return projectPointWithCenter(vertex, scaledV, centerNorm); });
+        const unNormalizedVertices = projectedVertices.map(vtx => { return unNormalizePoint(vtx, this._normInfo);});
 
-        const projectedVertices = this._normOriginalPolygonVertices.map(vertex => {
-            return projectPointWithCenter(vertex, scaledV, centerNorm);
+        const newAsteroidPositions = this._normOriginalAsteroids.map(siteNorm => projectPointWithCenter(siteNorm, scaledV, centerNorm))
+                                                                .map(pt => unNormalizePoint(pt, this._normInfo));
+
+        const newJohnEllipsoid = computeJohnEllipsoid(unNormalizedVertices);
+        const finalVertices = unNormalizedVertices.map(vertex => {
+            const y = mapJohnToUnitCircle(vertex, newJohnEllipsoid);
+            const newMappedPt = mapUnitCircleToJohn(y, this._origJohn); // original shape, original john ellipsoid
+            return newMappedPt;
         });
 
-        const unNormalizedVertices = projectedVertices.map(vtx => {
-            return unNormalizePoint(vtx, this._normInfo);
-        });
+        const currPolygon = this.canvas.polygon;
+        const newPolygon = new ConvexPolygon(
+            finalVertices,
+            currPolygon.color,
+            currPolygon.penWidth,
+            currPolygon.showInfo,
+            currPolygon.showVertices,
+            currPolygon.vertexRadius
+        );
+        this.canvas.polygon = newPolygon;
 
-        const newSitePositions = this._normOriginalSites.map(siteNorm => {
-            return projectPointWithCenter(siteNorm, scaledV, centerNorm);
-        }).map(pt => unNormalizePoint(pt, this._normInfo));
-
-        const newAsteroidPositions = this._normOriginalAsteroids.map(siteNorm => {
-            return projectPointWithCenter(siteNorm, scaledV, centerNorm);
-        }).map(pt => unNormalizePoint(pt, this._normInfo));
-
-        const newCircle = minimumEnclosingCircle(unNormalizedVertices);
-
-        if (newCircle.radius > 1e-10 && this._origCircle.radius > 1e-10) {
-            const finalVertices = [];
-            for (const vtx of unNormalizedVertices) {
-                finalVertices.push(
-                    mapCircleToCircle(
-                        vtx,
-                        newCircle.center, newCircle.radius,
-                        this._origCircle.center, this._origCircle.radius
-                    )
-                );
-            }
-
-            for (let i = 0; i < this.canvas.sites.length; i++) {
-                const oldPt = newSitePositions[i];
-                const mappedPt = mapCircleToCircle(
-                    oldPt,
-                    newCircle.center, newCircle.radius,
-                    this._origCircle.center, this._origCircle.radius
-                );
-
-                this.canvas.sites[i].x = mappedPt.x;
-                this.canvas.sites[i].y = mappedPt.y;
-            }
-            
+        if (this.canvas.showAsteroids) {
             for (let i = 0; i < this.canvas.asteroids.length; i++) {
-                const oldPt = newAsteroidPositions[i];
-                const mappedPt = mapCircleToCircle(
-                    oldPt,
-                    newCircle.center, newCircle.radius,
-                    this._origCircle.center, this._origCircle.radius
-                );
-
-                this.canvas.asteroids[i].x = mappedPt.x;
-                this.canvas.asteroids[i].y = mappedPt.y;
-            }
-
-            const currPolygon = this.canvas.polygon;
-            const newPolygon = new ConvexPolygon(
-                finalVertices,
-                currPolygon.color,
-                currPolygon.penWidth,
-                currPolygon.showInfo,
-                currPolygon.showVertices,
-                currPolygon.vertexRadius
-            );
-
-            this.canvas.polygon = newPolygon;
-
-            for (let i = 0; i < this.canvas.sites.length; i++) {
-                const s = this.canvas.sites[i];
-                if (pointInPolygon(s.x, s.y, newPolygon)) {
-                    s.convexPolygon = newPolygon;
-                    s.computeSpokes?.();
-                    s.computeHilbertBall?.();
-                    s.computeMultiBall?.();
-                }
-            }
-
-
-            if (this.canvas.showAsteroids) {
-                for (let i = 0; i < this.canvas.asteroids.length; i++) {
-                    const s = this.canvas.asteroids[i];
-                    if (pointInPolygon(s.x, s.y, newPolygon)) {
-                        s.convexPolygon = newPolygon;
-                        s.computeSpokes?.();
-                        s.computeHilbertBall?.();
-                    }
+                const a = this.canvas.asteroids[i];
+                const y = mapJohnToUnitCircle(newAsteroidPositions[i], newJohnEllipsoid);
+                const mappedPt = mapUnitCircleToJohn(y, this._origJohn);
+    
+                a.x = mappedPt.x;
+                a.y = mappedPt.y;
+    
+                if (pointInPolygon(a.x, a.y, newPolygon)) {
+                    a.convexPolygon = this.canvas.polygon;
+                    a.computeSpokes?.();
+                    a.computeHilbertBall?.();
                 }
             }
         }
@@ -282,12 +255,8 @@ function unNormalizePoint(pt, info) {
     );
 }
 
-function mapCircleToCircle(p, center1, r1, center2, r2) {
-    const dx = p.x - center1.x;
-    const dy = p.y - center1.y;
-    const scale = r2 / r1; 
-    return new Point(
-        center2.x + dx * scale,
-        center2.y + dy * scale
-    );
+function distance(p1, p2) {
+    const dx = p1.x - p2.x;
+    const dy = p1.y - p2.y;
+    return Math.sqrt(dx * dx + dy * dy);
 }

@@ -12,6 +12,47 @@ import {
   MinimumEnclosingHilbertBall
 } from './default-objects.js';
 
+export function fattenPolygon(polygon) {
+  const { center, rx, ry } = computeEnclosingEllipse(polygon.vertices);
+  const normPoints = [];
+
+  polygon.vertices.forEach(vertex => {
+    let x = (vertex.x - center.x) / rx;
+    let y = (vertex.y - center.y) / ry;
+
+    normPoints.push(new Point(x,y));
+  });
+
+  // inverse transformation
+  const unnormPoints = [];
+  normPoints.forEach(point => {
+    unnormPoints.push(new Point(point.x * rx + center.x, point.y * ry + center.y));
+  });
+
+  return new ConvexPolygon(unnormPoints, polygon.color, polygon.penWidth, polygon.showInfo, polygon.showVertices, polygon.vertexRadius, polygon.showPiMap);
+}
+
+// Credit: https://stackoverflow.com/questions/433371/ellipse-bounding-a-rectangle
+export function computeEnclosingEllipse(points) {
+
+  // Bounding box
+  let xMin = Infinity, xMax = -Infinity, yMin = Infinity, yMax = -Infinity;
+  points.forEach(point => {
+    if (point.x < xMin) xMin = point.x;
+    if (point.x > xMax) xMax = point.x;
+    if (point.y < yMin) yMin = point.y;
+    if (point.y > yMax) yMax = point.y;
+  });
+
+  let centerX = (xMin + xMax) / 2;
+  let centerY = (yMin + yMax) / 2;
+
+  let rx = ((xMax - xMin) / 2) * Math.sqrt(2);
+  let ry = ((yMax - yMin) / 2) * Math.sqrt(2);
+
+  return { center: { x: centerX, y: centerY }, rx, ry };
+}
+
 export function randomPointInsidePolygon(polygon) {
   let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
   polygon.vertices.forEach(v => {
@@ -35,97 +76,29 @@ export function pointInPolygon(x, y, polygon) {
   return polygon.contains(point);
 }
 
-export function getPolarBody(polygon, hilbertBall) {
-  // Ensure the polygon has at least 3 vertices
-  if (polygon.vertices.length < 3) {
-    return null;
-  }
-
-  // Use the center of the Hilbert ball (its site)
-  let center = hilbertBall;
-
-  // Function to calculate the dual line of a vertex
-  function vertexDual(v) {
-    let a = v.x - center.x;
-    let b = v.y - center.y;
-    let p1, p2;
-
-    if (a === 0) {
-      p1 = new Point(center.x, center.y + 1/b);
-      p2 = new Point(center.x + 1, center.y + 1/b);
-    } else if (b === 0) {
-      p1 = new Point(center.x + 1/a, center.y);
-      p2 = new Point(center.x + 1/a, center.y + 1);
-    } else {
-      p1 = new Point(center.x + 1/a, center.y);
-      p2 = new Point(center.x, center.y + 1/b);
-    }
-
-    return { p1, p2 };
-  }
-
-  // Function to find intersection of two lines
-  function intersect(l1, l2) {
-    let det = (l1.p1.x - l1.p2.x) * (l2.p1.y - l2.p2.y) - (l1.p1.y - l1.p2.y) * (l2.p1.x - l2.p2.x);
-    if (det === 0) return null; // Lines are parallel
-
-    let x = ((l1.p1.x * l1.p2.y - l1.p1.y * l1.p2.x) * (l2.p1.x - l2.p2.x) - 
-             (l1.p1.x - l1.p2.x) * (l2.p1.x * l2.p2.y - l2.p1.y * l2.p2.x)) / det;
-    let y = ((l1.p1.x * l1.p2.y - l1.p1.y * l1.p2.x) * (l2.p1.y - l2.p2.y) - 
-             (l1.p1.y - l1.p2.y) * (l2.p1.x * l2.p2.y - l2.p1.y * l2.p2.x)) / det;
-
-    return new Point(x, y);
-  }
-
-  // Calculate dual lines
-  let dualLines = polygon.vertices.map(v => vertexDual(v));
-
-  // Calculate intersection points
-  let polarVertices = [];
-  for (let i = 0; i < dualLines.length; i++) {
-    let j = (i + 1) % dualLines.length;
-    let intersection = intersect(dualLines[i], dualLines[j]);
-    if (intersection) {
-      polarVertices.push(intersection);
-    }
-  }
-
-  // Apply scaling (similar to the Lua version)
-  const scaleFactor = 30000; // You can adjust this value
-  let scaledVertices = polarVertices.map(v => new Point(
-    (v.x - center.x) * scaleFactor + center.x,
-    (v.y - center.y) * scaleFactor + center.y
-  ));
-
-  // Create a new convex polygon from the polar points
-  return new ConvexPolygon(scaledVertices, "orange");
-}
-
 function getCollinearPoints(site1, site2, intersectionPoints) {
 
     let intersectionPointsArr = Array.from(intersectionPoints);
   
     let intersection1 = intersectionPointsArr[0];
     let intersection2 = intersectionPointsArr[1];
-  
-    // Calculate distances using the ** operator
+
     let distance1ToSite1 = Math.sqrt((intersection1.x - site1.x) ** 2 + (intersection1.y - site1.y) ** 2);
     let distance1ToSite2 = Math.sqrt((intersection1.x - site2.x) ** 2 + (intersection1.y - site2.y) ** 2);
 
     let distance2ToSite1 = Math.sqrt((intersection2.x - site1.x) ** 2 + (intersection2.y - site1.y) ** 2);
     let distance2ToSite2 = Math.sqrt((intersection2.x - site2.x) ** 2 + (intersection2.y - site2.y) ** 2);
 
-    // Assign the closer intersection to intersection1
     if (distance1ToSite1 + distance2ToSite2 < distance1ToSite2 + distance2ToSite1) {
         // intersection1 is closer to site1 and intersection2 is closer to site2
     } else {
-        // Swap intersections
+        // swap intersections
         let temp = intersection1;
         intersection1 = intersection2;
         intersection2 = temp;
     }
 
-    // Return the points in the order I1, S1, S2, I2
+    // return the points in the order I1, S1, S2, I2
     return [intersection1, site1, site2, intersection2];
 }
 
@@ -557,17 +530,14 @@ export function solveQuadratic(a, b, c) {
   const discriminant = b * b - 4 * a * c;
   
   if (discriminant > 0) {
-      // Two real roots
       const sqrtDiscriminant = Math.sqrt(discriminant);
       return [
           (-b + sqrtDiscriminant) / (2 * a),
           (-b - sqrtDiscriminant) / (2 * a)
       ];
   } else if (discriminant === 0) {
-      // One real root
       return [-b / (2 * a)];
   } else {
-      // No real roots
       return [];
   }
 }
@@ -849,20 +819,16 @@ export function createPiGradientBar(minPi, maxPi) {
   // Adjust min and max values to truncate the gradient
   minPi = 3;
 
-  // Create a gradient that matches the heat map
   const gradientSteps = 100; // Increase steps for smoother gradient
   let gradientString = 'linear-gradient(to top,';
   for (let i = 0; i <= gradientSteps; i++) {
-    // Normalize value to the new range
     const normalizedValue = 3 + (i / gradientSteps) * (maxPi - 3);
     const color = getHeatMapColor((normalizedValue - 3) / (maxPi - 3));
     gradientString += ` ${color}${i < gradientSteps ? ',' : ')'}`;
   }
 
-  // Update gradient
   gradientBar.style.background = gradientString;
 
-  // Create value labels
   valuesContainer.innerHTML = ''; // Clear existing values
   const numValues = 5; // Number of values to display
   for (let i = 0; i < numValues; i++) {
@@ -1207,10 +1173,8 @@ export function create3DPiPlot(piValues, minX, minY, resolution, title) {
 }
 
 export function create3DPiLengthPlot(piValues, minX, minY, resolution, title, values) {
-  // Create a new window/tab
   const newWindow = window.open('', '_blank');
 
-  // Prepare the data for the 3D plot
   const height = piValues.length;
   const width = piValues[0].length;
   const x = Array.from({length: width}, (_, i) => minX + i * resolution);
@@ -1220,7 +1184,6 @@ export function create3DPiLengthPlot(piValues, minX, minY, resolution, title, va
   console.log('minX', minX);
   console.log('minX', minY);
 
-  // Write the HTML content to the new window
   newWindow.document.write(`
     <!DOCTYPE html>
     <html>
@@ -1315,14 +1278,11 @@ function normalizeGradient(gradientField) {
 }
 
 export function createGradientFlowPlot(gradientField, minX, minY, resolution, title, scale = 10) {
-  // Create a new window/tab
   const newWindow = window.open('', '_blank');
 
-  // Calculate canvas size (increased by a factor of 4)
   const width = gradientField[0].length * resolution * 4;
   const height = gradientField.length * resolution * 4;
 
-  // Write the HTML content to the new window
   newWindow.document.write(`
     <!DOCTYPE html>
     <html>
@@ -1516,7 +1476,7 @@ function getPointsOnConic(equation, startPoint, endPoint, sector, omega, resolut
       );
 
       let linePoints = getPointsOnLine(lastValidPoint, closestPoint, resolution);
-      points.push(...linePoints.slice(1)); // Exclude the first point to avoid duplication
+      points.push(...linePoints.slice(1));
       lastValidPoint = closestPoint;
     }
   }

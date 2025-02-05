@@ -13,7 +13,6 @@ import {
   drawBoundedConic,
   hilbertDistance,
   getHyperbolaCenter,
-  getPolarBody,
   lineIntersection,
   getPointsForDrawboundedShape,
   drawPieceForIntersection,
@@ -270,6 +269,7 @@ export class ConvexPolygon {
         this.showInfo = showInfo;
         this.showVertices = showVertices;
         this.vertexRadius = vertexRadius;
+        
         if (vertices.length > 2) this.showPiMap = showPiMap;
     }
     
@@ -551,7 +551,6 @@ export class HilbertBall extends Site {
       this.pointsOnBall = getPointsOnHilbertBall(this, this.ballRadius);
       this.boundaryColor = boundaryColor;
       this.polygon = new ConvexPolygon(this.pointsOnBall, this.boundaryColor, penWidth);
-      this.polarBody = getPolarBody(this.polygon, this);
       this.textureEnabled = false;
 
   }
@@ -574,7 +573,6 @@ export class HilbertBall extends Site {
   computeHilbertBall() { 
     this.pointsOnBall = getPointsOnHilbertBall(this, this.ballRadius); 
     this.polygon = new ConvexPolygon(this.pointsOnBall, this.boundaryColor, this.polygon.penWidth);
-    this.polarBody = getPolarBody(this.polygon, this);
   }
 
   computePerimeter(polygon) {

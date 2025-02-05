@@ -1,6 +1,6 @@
 // space-events.js
 
-import { pointInPolygon } from "../../default-functions.js";
+import { fattenPolygon, pointInPolygon } from "../../default-functions.js";
 import { Point } from "../../default-objects.js";
 
 
@@ -51,6 +51,8 @@ export function initMouseActions(manager) {
             };
 
             manager.projectPoints(velocityVector);
+
+            manager.canvas.polygon = fattenPolygon(manager.canvas.polygon);
         }
     };
 
