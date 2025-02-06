@@ -1279,3 +1279,32 @@
     transform: scale(0.98);
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
 }
+
+  #toggleBackgroundButton {
+    position: fixed;       
+    bottom: 20px;          
+    right: 400px;
+    z-index: 1000;
+    background: radial-gradient(circle at top left, #0d0d2b, #000);
+    color: #fff;
+    border: 2px solid #f02c12;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+    transition: transform 0.2s, box-shadow 0.2s; 
+    display: none;
+}
+
+#toggleAsteroidsButton:hover {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+#toggleAsteroidsButton:active {
+    transform: scale(0.98);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+}

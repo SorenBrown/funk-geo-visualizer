@@ -153,17 +153,17 @@ document.getElementById("spriteModeButton").addEventListener("click", () => {
     
   
     if (window.canvas) {
-      canvas.sites = [];
-      canvas.metricBalls = [];
+      // canvas.sites = [];
+      // canvas.metricBalls = [];
       canvas.selectionOrder = [];
       canvas.segments = [];
       canvas.bisectors = [];
       canvas.thompsonBisectors = [];
     }
   
-    generateStars(2000);
     generateHilbertAsteroids(25);
-  
+    
+    generateStars(2000);
     if (window.canvas && canvas.polygon) {
       canvas.polygon.setFill("black");
     }
@@ -176,10 +176,12 @@ document.getElementById("spriteModeButton").addEventListener("click", () => {
   
 
     document.getElementById("toggleAsteroidsButton").style.display = "inline-block";
+    document.getElementById("toggleBackgroundButton").style.display = "inline-block";
     canvas.drawAll();
   } else {
     canvas.polygon = canvas.initialPolygon;
     document.getElementById("toggleAsteroidsButton").style.display = "none";
+    document.getElementById("toggleBackgroundButton").style.display = "none";
     canvas.drawAll();
   }
 });
@@ -303,6 +305,18 @@ toggleButton.addEventListener("click", () => {
   } else {
     generateHilbertAsteroids(30);
     toggleButton.textContent = "Turn Off Asteroids";
+  }
+  canvas.drawAll();
+});
+
+const toggleBackgroundButton = document.getElementById("toggleBackgroundButton");
+
+toggleBackgroundButton.addEventListener("click", () => {
+  canvas.showBackground = !canvas.showBackground;
+  if (!canvas.showBackground) {
+    toggleBackgroundButton.textContent = "Turn On Background";
+  } else {
+    toggleBackgroundButton.textContent = "Turn Off Background";
   }
   canvas.drawAll();
 });

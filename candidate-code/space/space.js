@@ -37,7 +37,7 @@ class Matrix {
     }
 }
 
-// Algorithms for ellipsoids: https://tcg.mae.cornell.edu/pubs/Pope_FDA_08.pdf
+// algorithms for ellipsoids: https://tcg.mae.cornell.edu/pubs/Pope_FDA_08.pdf
 function computeJohnEllipsoid(points) {
     // Find the centroid of the polygon.
     let centroid_ = centroid(points);
@@ -66,13 +66,16 @@ function computeJohnEllipsoid(points) {
     let inverseCovarianceMatrix = covarianceMatrix.inv().matrix;
 
     // mahanobolis distance: https://math.stackexchange.com/questions/428064/distance-of-a-test-point-from-the-center-of-an-ellipsoid
-    // Find the Scaling factor - take the point furthest away from the centroid
+    // find the Scaling factor - take the point furthest away from the centroid
     let scalingFactor = 0;
     for (let point of points) {
         // mahalanobis distance
         let x = point.x - cx;
         let y = point.y - cy;
+
+        // [x,y]^T * S^-1 * [x,y] <- no square root (scaling wasn't enough)
         let dist = (x**2) * inverseCovarianceMatrix[0][0] + 2 * x * y * inverseCovarianceMatrix[0][1] + (y ** 2) * inverseCovarianceMatrix[1][1];
+
         if (dist > scalingFactor) {
             scalingFactor = dist;
         }
@@ -90,16 +93,16 @@ function computeJohnEllipsoid(points) {
     
 }
 
-// Credit: https://www.mathworks.com/matlabcentral/answers/566250-how-to-transform-a-ellipse-to-circle
+// credit: https://www.mathworks.com/matlabcentral/answers/566250-how-to-transform-a-ellipse-to-circle
 function mapJohnToUnitCircle(point, ellipsoid) {
-    // y = L(x-c)
+    // y = L(x-c) <-- change of variables
     const L = ellipsoid.matrix.cholesky();
     const diff = new Point(point.x - ellipsoid.center.x, point.y - ellipsoid.center.y);
     return L.apply(diff);
 }
 
 function mapUnitCircleToJohn(y, ellipsoid) {
-    // x = L^{-1}y + c
+    // x = L^{-1}y + c 
     const L = ellipsoid.matrix.cholesky();
     const mappedDifference = L.inv().apply(y);
     const a = mappedDifference.x + ellipsoid.center.x;
@@ -115,7 +118,6 @@ export class SpaceManager extends SiteManager {
         this._listenersAttached = false;
 
         this._normOriginalPolygonVertices = [];
-        this._normOriginalSites = [];
         this._normInfo = null;
 
         this._origJohn = null;
@@ -150,14 +152,14 @@ export class SpaceManager extends SiteManager {
             };
         });
 
-        this._normOriginalSites = this.canvas.sites.map(site => {
+        this._normOriginalAsteroids = this.canvas.asteroids.map(site => {
             return {
                 x: (site.x - xMid) * scale,
                 y: (site.y - yMid) * scale
             };
         });
 
-        this._normOriginalAsteroids = this.canvas.asteroids.map(site => {
+        this._normOriginalSites = this.canvas.sites.map(site => {
             return {
                 x: (site.x - xMid) * scale,
                 y: (site.y - yMid) * scale
@@ -176,11 +178,12 @@ export class SpaceManager extends SiteManager {
         const velocityFactor = 0.001;
         const scaledV = { x: v.x * velocityFactor, y: v.y * velocityFactor };
 
-        const centerNorm = centroid(this._normOriginalPolygonVertices);
-        const projectedVertices = this._normOriginalPolygonVertices.map(vertex => { return projectPointWithCenter(vertex, scaledV, centerNorm); });
+        const projectedVertices = this._normOriginalPolygonVertices.map(vertex => { return projectPoint(vertex, scaledV); });
         const unNormalizedVertices = projectedVertices.map(vtx => { return unNormalizePoint(vtx, this._normInfo);});
 
-        const newAsteroidPositions = this._normOriginalAsteroids.map(siteNorm => projectPointWithCenter(siteNorm, scaledV, centerNorm))
+        const newAsteroidPositions = this._normOriginalAsteroids.map(siteNorm => projectPoint(siteNorm, scaledV))
+                                                                .map(pt => unNormalizePoint(pt, this._normInfo));
+        const newSitePositions = this._normOriginalSites.map(siteNorm => projectPoint(siteNorm, scaledV))
                                                                 .map(pt => unNormalizePoint(pt, this._normInfo));
 
         const newJohnEllipsoid = computeJohnEllipsoid(unNormalizedVertices);
@@ -218,6 +221,24 @@ export class SpaceManager extends SiteManager {
             }
         }
 
+        if (this.canvas.sites.length > 0) {
+            for (let i = 0; i < this.canvas.sites.length; i++) {    
+                const s = this.canvas.sites[i];
+                const y = mapJohnToUnitCircle(newSitePositions[i], newJohnEllipsoid);
+                const mappedPt = mapUnitCircleToJohn(y, this._origJohn);
+    
+                s.x = mappedPt.x;
+                s.y = mappedPt.y;
+    
+                if (pointInPolygon(s.x, s.y, newPolygon)) {
+                    s.convexPolygon = this.canvas.polygon;
+                    s.computeSpokes?.();
+                    s.computeHilbertBall?.();
+                    s.computeMultiBall?.();
+                }
+            }
+        }
+
         this.canvas.drawAll();
     }
 
@@ -232,7 +253,8 @@ export class SpaceManager extends SiteManager {
     }
 }
 
-function projectPointWithCenter(point, velocity, center) {
+function projectPoint(point, velocity) {
+
     const px = point.x;
     const py = point.y;
 
@@ -256,10 +278,4 @@ function unNormalizePoint(pt, info) {
         (pt.x / scale) + xMid,
         (pt.y / scale) + yMid
     );
-}
-
-function distance(p1, p2) {
-    const dx = p1.x - p2.x;
-    const dy = p1.y - p2.y;
-    return Math.sqrt(dx * dx + dy * dy);
 }

@@ -301,12 +301,16 @@ export class Canvas {
     
         if (this.spriteMode) {
             
-            this.polygon.fill(this.ctx);
-            this.stars.forEach(star => {
-                if (this.polygon.contains({ x: star.x, y: star.y })) {
-                    star.draw(this.ctx);
-                }
-            });
+            if (this.showBackground) {
+                this.polygon.fill(this.ctx);
+                this.stars.forEach(star => {
+                    if (this.polygon.contains({ x: star.x, y: star.y })) {
+                        star.draw(this.ctx);
+                    }
+                });
+            }
+            
+            
             if (this.showAsteroids) {
                 this.asteroids.forEach(asteroid => {
                     asteroid.setDraw(false);
@@ -332,6 +336,15 @@ export class Canvas {
                     "transparent"
                 );
             }
+
+            if (this.polygon && this.showCentroid) {
+                this.centroid = centroid(this.polygon.vertices);
+                this.drawXMarker(this.centroid, 'red', 10);
+            }
+
+            this.sites.forEach(site => {
+                site.draw(this.ctx);
+            });
             
         } else {    
             this.thompsonBisectors = this.thompsonBisectors.filter(thompBobj => {
