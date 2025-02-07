@@ -50,6 +50,7 @@ export class Canvas {
         this.sprite = null;
         
         this.showAsteroids = false;
+        this.showBackground = true;
 
     }
     

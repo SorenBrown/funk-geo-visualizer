@@ -1,8 +1,6 @@
-// space.js
-
 import { SiteManager } from "../site/site.js";
 import { ConvexPolygon, Point } from "../../default-objects.js";
-import { centroid, pointInPolygon } from "../../default-functions.js";
+import { centroid, pointInPolygon, norm } from "../../default-functions.js";
 import { initMouseActions, destroyMouseActions } from "./space-events.js";
 
 // Class for a 2d matrix
@@ -126,6 +124,8 @@ export class SpaceManager extends SiteManager {
     storeOriginalGeometry() {
         const vertices = this.canvas.polygon.vertices;
 
+        let { x: cx, y: cy } = centroid(vertices);
+
         let xMin = Infinity, xMax = -Infinity;
         let yMin = Infinity, yMax = -Infinity;
 
@@ -140,29 +140,26 @@ export class SpaceManager extends SiteManager {
         const height = yMax - yMin;
         const scale = 2 / Math.max(width, height);
 
-        const xMid = (xMax + xMin) / 2;
-        const yMid = (yMax + yMin) / 2;
-
-        this._normInfo = { xMin, xMax, yMin, yMax, xMid, yMid, scale };
+        this._normInfo = { cx,cy, scale };
 
         this._normOriginalPolygonVertices = vertices.map(v => {
             return {
-                x: (v.x - xMid) * scale,
-                y: (v.y - yMid) * scale
+                x: (v.x - cx) * scale,
+                y: (v.y - cy) * scale
             };
         });
 
         this._normOriginalAsteroids = this.canvas.asteroids.map(site => {
             return {
-                x: (site.x - xMid) * scale,
-                y: (site.y - yMid) * scale
+                x: (site.x - cx) * scale,
+                y: (site.y - cy) * scale
             };
         });
 
         this._normOriginalSites = this.canvas.sites.map(site => {
             return {
-                x: (site.x - xMid) * scale,
-                y: (site.y - yMid) * scale
+                x: (site.x - cx) * scale,
+                y: (site.y - cy) * scale
             };
         });
     }
@@ -273,9 +270,9 @@ function projectPoint(point, velocity) {
 }
 
 function unNormalizePoint(pt, info) {
-    const { xMid, yMid, scale } = info;
+    const { cx, cy, scale } = info;
     return new Point(
-        (pt.x / scale) + xMid,
-        (pt.y / scale) + yMid
+        (pt.x / scale) + cx,
+        (pt.y / scale) + cy
     );
 }
