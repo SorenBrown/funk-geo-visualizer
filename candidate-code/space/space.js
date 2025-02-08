@@ -96,6 +96,7 @@ function mapJohnToUnitCircle(point, ellipsoid) {
     // y = L(x-c) <-- change of variables
     const L = ellipsoid.matrix.cholesky();
     const diff = new Point(point.x - ellipsoid.center.x, point.y - ellipsoid.center.y);
+    console.log(L);
     return L.apply(diff);
 }
 
@@ -106,6 +107,33 @@ function mapUnitCircleToJohn(y, ellipsoid) {
     const a = mappedDifference.x + ellipsoid.center.x;
     const b = mappedDifference.y + ellipsoid.center.y;
     return new Point(a,b);
+}
+
+function projectPoint(point, velocity) {
+
+    const px = point.x;
+    const py = point.y;
+
+    const dot = px * velocity.x + py * velocity.y;
+    let denom = 1 + dot;
+
+    if (Math.abs(denom) < 1e-5) {
+        denom = (denom < 0) ? -1e-3 : 1e-3;
+    }
+
+    const factor = 1 / denom;
+    const newX = px * factor;
+    const newY = py * factor;
+
+    return new Point(newX, newY);
+}
+
+function unNormalizePoint(pt, info) {
+    const { cx, cy, scale } = info;
+    return new Point(
+        (pt.x / scale) + cx,
+        (pt.y / scale) + cy
+    );
 }
 
 
@@ -167,7 +195,6 @@ export class SpaceManager extends SiteManager {
     storeOriginalOriginalGeometry() {
         this._origJohn = computeJohnEllipsoid(this.canvas.polygon.vertices);
     }
-
     
     projectPoints(v) {
         if (!this._normInfo || !this._origJohn) return;
@@ -176,6 +203,7 @@ export class SpaceManager extends SiteManager {
         const scaledV = { x: v.x * velocityFactor, y: v.y * velocityFactor };
 
         const projectedVertices = this._normOriginalPolygonVertices.map(vertex => { return projectPoint(vertex, scaledV); });
+
         const unNormalizedVertices = projectedVertices.map(vtx => { return unNormalizePoint(vtx, this._normInfo);});
 
         const newAsteroidPositions = this._normOriginalAsteroids.map(siteNorm => projectPoint(siteNorm, scaledV))
@@ -214,6 +242,7 @@ export class SpaceManager extends SiteManager {
                     a.convexPolygon = this.canvas.polygon;
                     a.computeSpokes?.();
                     a.computeHilbertBall?.();
+                    s.computeMultiBall?.();
                 }
             }
         }
@@ -250,29 +279,3 @@ export class SpaceManager extends SiteManager {
     }
 }
 
-function projectPoint(point, velocity) {
-
-    const px = point.x;
-    const py = point.y;
-
-    const dot = px * velocity.x + py * velocity.y;
-    let denom = 1 + dot;
-
-    if (Math.abs(denom) < 1e-5) {
-        denom = (denom < 0) ? -1e-3 : 1e-3;
-    }
-
-    const factor = 1 / denom;
-    const newX = px * factor;
-    const newY = py * factor;
-
-    return new Point(newX, newY);
-}
-
-function unNormalizePoint(pt, info) {
-    const { cx, cy, scale } = info;
-    return new Point(
-        (pt.x / scale) + cx,
-        (pt.y / scale) + cy
-    );
-}

@@ -153,8 +153,6 @@ document.getElementById("spriteModeButton").addEventListener("click", () => {
     
   
     if (window.canvas) {
-      // canvas.sites = [];
-      // canvas.metricBalls = [];
       canvas.selectionOrder = [];
       canvas.segments = [];
       canvas.bisectors = [];
