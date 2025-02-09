@@ -242,7 +242,7 @@ export class SpaceManager extends SiteManager {
                     a.convexPolygon = this.canvas.polygon;
                     a.computeSpokes?.();
                     a.computeHilbertBall?.();
-                    s.computeMultiBall?.();
+                    a.computeMultiBall?.();
                 }
             }
         }
