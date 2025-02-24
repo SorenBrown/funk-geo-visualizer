@@ -1,1 +1,1 @@
-# VisualizingTheHilbertBall
+# Visualizing The Funk Geometry
