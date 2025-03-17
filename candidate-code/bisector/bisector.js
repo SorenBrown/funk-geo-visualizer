@@ -154,18 +154,16 @@ export class BisectorManager {
     createThompsonBisector(s1,s2) {
         const ctx = this.canvas.ctx;
     
-        // Get bounding box of the polygon
         const minX = Math.min(...this.canvas.polygon.vertices.map(v => v.x));
         const maxX = Math.max(...this.canvas.polygon.vertices.map(v => v.x));
         const minY = Math.min(...this.canvas.polygon.vertices.map(v => v.y));
         const maxY = Math.max(...this.canvas.polygon.vertices.map(v => v.y));
     
-        // Set resolution for the grid
         let resolution = prompt("Enter resolution (default is 1):");
         if (resolution === null || resolution.trim() === "") {
             resolution = 1;
         } else {
-            resolution = parseFloat(resolution); // Convert to number
+            resolution = parseFloat(resolution);
             if (isNaN(resolution) || resolution <= 0) {
                 alert("Invalid input. Using default resolution of 1.");
                 resolution = 1;
@@ -177,17 +175,15 @@ export class BisectorManager {
             for (let y = minY; y <= maxY; y += resolution) {
                 const point = new Point(x, y);
     
-                // Check if the point is inside the polygon
                 if (this.canvas.polygon.contains(point)) {
-                    // Compute Hilbert distances
                     try {
                         const d1 = thompsonDistance(s1, point, this.canvas.polygon);
                         const d2 = thompsonDistance(s2, point, this.canvas.polygon);
         
-                        // Check if distances are approximately equal
-                        if (Math.abs(d1 - d2) < 1e-2) { // Tolerance for floating-point comparisons
+
+                        if (Math.abs(d1 - d2) < 1e-2) {
                             point.setRadius(1);
-                            point.setColor('red'); // Optional: Highlight equidistant points
+                            point.setColor('red');
                             point.draw(ctx);
                             points.push(point);
                         }
