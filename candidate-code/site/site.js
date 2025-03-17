@@ -101,7 +101,7 @@ export class SiteManager {
     selectSite(event, multiple = false) {
         const { x, y } = this.canvas.getMousePos(event);
         let siteSelected = false;
-        const sitesPreviouslySelected = this.canvas.sites.some(site => site.selected); // Check if any sites were previously selected
+        const sitesPreviouslySelected = this.canvas.sites.some(site => site.selected); 
     
         this.canvas.sites.forEach(site => {
             if (mouseOnSite({ x, y }, site)) {
@@ -181,10 +181,6 @@ export class SiteManager {
         }
     }
 
-    // removeBallSegments(ball) {
-    //     this.canvas.segments = this.canvas.segments.filter(segment => !ball.polygon.segments.includes(segment)); 
-    // }
-
     stopDragging() {
         this.isDragging = false;
     }
@@ -235,12 +231,6 @@ export class SiteManager {
                 this.canvas.selectionOrder.push(site);
             }
         });
-
-        // this.canvas.segments.forEach(segment => {
-        //     if (!segment.belongsToBallBoundary && segment.isWithinSelectionBox(minX, minY, maxX, maxY)) {
-        //         segment.setSelected(true);
-        //     }
-        // });
 
         this.setDefaultValuesForMultiple(); 
         this.drawAll();

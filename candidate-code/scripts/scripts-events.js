@@ -56,7 +56,7 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
             setDisplay(thompsonCollapsible, 'none');
             setDisplay(savedDistancesContainer, 'none');
             setDisplay(savedBisectorsContainer, 'none');
-            setDisplay(metricBallSelectionCard, 'none'); // Hide the card
+            setDisplay(metricBallSelectionCard, 'none'); 
             setDisplay(settingsLabel, 'block'); 
             setDisplay(siteColorInput, 'block');
             setDisplay(multiBallRadiusContainer, 'none');
@@ -77,7 +77,7 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
             setDisplay(rfunkCollapsible, 'none');
             setDisplay(thompsonCollapsible, 'none');
             setDisplay(savedBisectorsContainer, 'none');
-            setDisplay(metricBallSelectionCard, 'none'); // Hide the card
+            setDisplay(metricBallSelectionCard, 'none'); 
             setDisplay(settingsLabel, 'none'); 
             setDisplay(siteColorInput, 'none'); 
             setDisplay(multiBallRadiusContainer, 'none');
@@ -156,7 +156,7 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
             setDisplay(thompsonCollapsible, 'none');
             setDisplay(savedDistancesContainer, 'none');
             setDisplay(savedBisectorsContainer, 'none');
-            setDisplay(metricBallSelectionCard, 'none'); // Hide the card
+            setDisplay(metricBallSelectionCard, 'none'); 
             setDisplay(siteColorInput, 'none'); 
             setDisplay(multiBallRadiusContainer, 'none');
             setDisplay(spriteModeButton, 'none');

@@ -82,7 +82,6 @@ function assignBallAndSiteProperties(manager, forceUpdate = false) {
             }
 
             if (forceUpdate) {
-                // Independent site properties
                 site.showInfo = getElementChecked('siteShowInfo');
                 site.drawSpokes = getElementChecked('siteDrawSpokes');
                 site.label = getElementValue('labelInput');
@@ -90,7 +89,7 @@ function assignBallAndSiteProperties(manager, forceUpdate = false) {
         }
     });
 
-    manager.drawAll(); // Redraw to reflect changes
+    manager.drawAll(); 
 }
 
 function updateBallProperties(ball, type, changedProperties, forceUpdate) {
@@ -101,7 +100,6 @@ function updateBallProperties(ball, type, changedProperties, forceUpdate) {
         ball.setBoundaryColor(boundaryColor);
         ball.setColor(boundaryColor);
 
-        // Sync the boundary color with the site color input
         document.getElementById('siteColor').value = boundaryColor;
         document.getElementById('siteColor').defaultValue = boundaryColor;
     }
@@ -161,14 +159,13 @@ export function initProperties(hilbertBallManager) {
         ThompsonBall: '#800080'
     };
 
-    // Apply default color to corresponding color input on initialization
     Object.entries(defaultColors).forEach(([type, color]) => {
         const { colorInputId } = hilbertBallManager.getPropertyElements(type);
         const colorInput = document.getElementById(colorInputId);
 
         if (colorInput) {
-            colorInput.value = color; // Set the input value
-            colorInput.defaultValue = color; // Ensure the default value is set
+            colorInput.value = color; 
+            colorInput.defaultValue = color;
         }
     });
 
@@ -191,8 +188,6 @@ export function initProperties(hilbertBallManager) {
             resetIcon.addEventListener('click', () => {
                 slider.value = 1;
                 input.value = 1;
-
-                // Force property update to apply reset values
                 assignBallAndSiteProperties(hilbertBallManager, true);
             });
         }

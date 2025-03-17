@@ -305,7 +305,7 @@ export class ConvexPolygon {
     /* (body:ConvexPolygon, line:Segment) -> (Set(Point)) */
     intersectWithLine(line) {
       let intersections = [];
-      const epsilon = 1e-10; // Small value for floating-point comparison
+      const epsilon = 1e-10; 
     
       function isCloseTo(a, b) { return Math.abs(a - b) < epsilon; }
     

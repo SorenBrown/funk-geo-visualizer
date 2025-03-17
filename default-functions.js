@@ -650,7 +650,6 @@ export function drawBoundedConic(ctx, equation, omega, startPoint, endPoint,sect
   } else if (omega.areAnySegmentsParallel(sector.sector)) {
     (new Segment(startPoint, endPoint, color, 2)).draw(ctx);
   } else {
-    // Draw a hyperbola with respect to the equation and between the start and end point
     drawBoundedHyperbola(ctx, sector, equation, startPoint, endPoint, resolution, color);
   }
 }
@@ -664,7 +663,6 @@ export function getHyperbolaCenter(equation) {
   const {A,B,C,D,E,F} = equation;
   let denominator = B * B - 4 * A * C;
   
-  // Check if the denominator is zero (or very close to zero)
   if (Math.abs(denominator) < 1e-10) {
       throw new Error("This conic might not be a hyperbola or the equation might be degenerate.");
   }
@@ -714,15 +712,12 @@ export function getEllipseParams(equation) {
 }
 
 function pointToAngle(point, center, a, b, rotationAngle) {
-  // Translate point to origin
   let x = point.x - center.x;
   let y = point.y - center.y;
   
-  // Rotate point
   let xRotated = x * Math.cos(-rotationAngle) - y * Math.sin(-rotationAngle);
   let yRotated = x * Math.sin(-rotationAngle) + y * Math.cos(-rotationAngle);
   
-  // Calculate angle
   return Math.atan2(yRotated / b, xRotated / a);
 }
 
@@ -767,13 +762,8 @@ export function drawBoundedHyperbola(ctx, sector, equation, startPoint, endPoint
           lastValidPoint = new Point(x, closestY);
       }
   }
-
-  // Ensure we connect to the endpoint
   ctx.lineTo(endPoint.x, endPoint.y);
-
   ctx.stroke();
-
-    
 }
 
 export function findNearestNeighborValue(piValues, x, y) {
@@ -987,10 +977,8 @@ export async function createPiMap(ctx, resolution = 1, polygon, stepSize = -1, r
 }
 
 export function createScatterPlot(xValues, yValues, title, xAxisLabel, yAxisLabel) {
-  // Create a new window/tab
   const newWindow = window.open('', '_blank');
 
-  // Write the HTML content to the new window
   newWindow.document.write(`
     <!DOCTYPE html>
     <html>
@@ -1396,7 +1384,7 @@ export function drawPieceForIntersection(ctx, piece, color) {
 }
 
 export function isIntersectionPixel(pixelData) {
-  const redThreshold = 50;  // Adjust these thresholds as needed
+  const redThreshold = 50;  
   const blueThreshold = 50;
   const alphaThreshold = 100;  // To ensure we're not detecting nearly transparent pixels
   
@@ -1481,7 +1469,6 @@ function getPointsOnConic(equation, startPoint, endPoint, sector, omega, resolut
     }
   }
 
-  // Add final segment to endPoint if necessary
   if (!lastValidPoint.isEqual(endPoint)) {
     let finalLinePoints = getPointsOnLine(lastValidPoint, endPoint, resolution);
     points.push(...finalLinePoints.slice(1));
@@ -1558,9 +1545,6 @@ export function drawBisectorsOfHilbertCircumcenter(s1, s2, s3, omega, ctx) {
   bisector1.draw(ctx);
   bisector2.draw(ctx);
   bisector3.draw(ctx);
-  // drawBisectorPoints(bisector1, 'red', ctx);
-  // drawBisectorPoints(bisector2, 'blue', ctx);
-  // drawBisectorPoints(bisector3, 'green', ctx);
 }
 
 export function createHilbertMinimumEnclosingRadiusBall(sites, omega) {
@@ -1575,13 +1559,6 @@ export function crossProduct(px, py, qx, qy, rx, ry){
   return pqx * pry - pqy * prx;
 }
 
-/**
- * Perturbs the polygon by shifting each vertex in a specific direction.
- * @param {ConvexPolygon} polygon - The polygon to perturb.
- * @param {number} epsilon - The small value to shift each vertex.
- * @param {number} direction - The direction of the perturbation (-1, 1).
- * @returns {ConvexPolygon} - The perturbed polygon.
- */
 export function perturbPolygon(polygon, epsilon = 0.5, direction = 1) {
   const perturbedVertices = polygon.vertices.map(vertex => {
       return new Point(

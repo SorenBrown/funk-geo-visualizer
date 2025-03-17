@@ -12,7 +12,6 @@ import {
 } from "./scripts-events.js";
 import { initializeJsonHandlers, isAnyModalOpen } from "./scripts-json-events.js";
 
-// Create and initialize the Canvas object
 let canvasElement = document.getElementById('canvas');
 let canvas = new Canvas(canvasElement);
 

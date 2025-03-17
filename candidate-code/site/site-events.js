@@ -17,16 +17,13 @@ function debounce(func, wait) {
     };
 }
 
-// Modified site-events.js
+
 export function initMouseActions(siteManager) {
     const canvasElement = siteManager.canvas.canvas;
-    
-    // Remove existing listeners if any
+
     if (siteManager._listenersAttached) {
         destroyMouseActions(siteManager);
     }
-
-    // Define handler methods directly on the manager
     siteManager._mouseDownHandler = (event) => {
         if (event.shiftKey) {
             siteManager.startDragSelect(event);
@@ -91,7 +88,6 @@ export function destroyMouseActions(siteManager) {
         canvasElement.removeEventListener('click', siteManager._clickHandler);
         document.removeEventListener('keydown', siteManager._keyDownHandler);
         
-        // Cleanup handler references
         delete siteManager._mouseDownHandler;
         delete siteManager._mouseMoveHandler;
         delete siteManager._mouseUpHandler;
@@ -140,19 +136,19 @@ function updateSiteProperties(manager) {
             if (site.selected) {
                 if (changedProperties.color && document.getElementById('siteColor').value !== '') {
                     site.color = document.getElementById('siteColor').value;
-                    document.getElementById('siteColor').defaultValue = site.color; // Update default value
+                    document.getElementById('siteColor').defaultValue = site.color; 
                 }
                 if (changedProperties.showInfo) {
                     site.showInfo = document.getElementById('siteShowInfo').checked;
-                    document.getElementById('siteShowInfo').defaultChecked = site.showInfo; // Update default value
+                    document.getElementById('siteShowInfo').defaultChecked = site.showInfo; 
                 }
                 if (changedProperties.drawSpokes) {
                     site.drawSpokes = document.getElementById('siteDrawSpokes').checked;
-                    document.getElementById('siteDrawSpokes').defaultChecked = site.drawSpokes; // Update default value
+                    document.getElementById('siteDrawSpokes').defaultChecked = site.drawSpokes;
                 }
                 if (changedProperties.label) {
                     site.label = document.getElementById('labelInput').value;
-                    document.getElementById('labelInput').defaultValue = site.label; // Update default value
+                    document.getElementById('labelInput').defaultValue = site.label;
                 }
             }
         });
@@ -201,7 +197,6 @@ export function initContextMenu(siteManager) {
     const drawBisector = document.getElementById('drawBisector');
     const drawThompsonBisector = document.getElementById('drawThompsonBisector');
 
-    // Hide context menu on any click
     document.addEventListener('click', () => {
         contextMenu.style.display = 'none';
     });

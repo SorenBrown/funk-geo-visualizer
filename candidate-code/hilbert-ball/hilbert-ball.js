@@ -42,20 +42,18 @@ export class HilbertBallManager extends SiteManager {
           const site = new Site(x, y, this.canvas.polygon,'black',getElementChecked('siteDrawSpokes'));
   
           if (selectedBallTypes.length === 1) {
-              // Create a single ball if only one type is selected
               const type = selectedBallTypes[0];
               const ball = this.createBallByType(type, site);
               this.assignBallProperties(ball, type);
-              this.canvas.sites.push(ball); // Push single ball to sites
+              this.canvas.sites.push(ball); 
           } else {
-              // Create a MultiBall if multiple types are selected
               const multiBall = new MultiBall(site);
               selectedBallTypes.forEach(type => {
                   const ball = this.createBallByType(type, site);
                   this.assignBallProperties(ball, type);
                   multiBall.addBall(type, ball);
               });
-              this.canvas.sites.push(multiBall); // Push MultiBall to sites
+              this.canvas.sites.push(multiBall); 
           }
   
           this.drawAll();
@@ -68,11 +66,11 @@ export class HilbertBallManager extends SiteManager {
             case 'HilbertBall':
                 return new HilbertBall(site);
             case 'ForwardFunkBall':
-                return new ForwardFunkBall(site); // Ensure this class is implemented
+                return new ForwardFunkBall(site); 
             case 'ReverseFunkBall':
-                return new ReverseFunkBall(site); // Ensure this class is implemented
+                return new ReverseFunkBall(site); 
             case 'ThompsonBall':
-                return new ThompsonBall(site); // Ensure this class is implemented
+                return new ThompsonBall(site);
             default:
                 throw new Error('Unknown ball type');
         }
@@ -81,15 +79,12 @@ export class HilbertBallManager extends SiteManager {
     assignBallProperties(ball, type) {
       const { colorInputId, radiusInputId } = this.getPropertyElements(type);
   
-      // Set boundary color and sync with the ball's color
       const boundaryColor = document.getElementById(colorInputId).value;
       ball.setBoundaryColor(boundaryColor);
       ball.setColor(boundaryColor);
   
-      // Set radius
       ball.setBallRadius(parseFloat(document.getElementById(radiusInputId).value));
   
-      // Ensure independent behavior for drawSpokes, showInfo, and label
       const showInfo = document.getElementById('siteShowInfo').checked;
       const drawSpokes = document.getElementById('siteDrawSpokes').checked;
       const label = document.getElementById('labelInput').value;
@@ -132,27 +127,10 @@ export class HilbertBallManager extends SiteManager {
 
     updateHilbertBallProperties(ball) {
         super.updateSiteProperties(ball);
-        
-        // Ensure the site color matches the selected ball's boundary color
         const { colorInputId, radiusInputId } = this.getPropertyElements(ball.constructor.name);
     
         document.getElementById('siteColor').value = ball.boundaryColor; // <-- This line ensures site color matches the ball
         document.getElementById(colorInputId).value = ball.boundaryColor;
         document.getElementById(radiusInputId).value = ball.ballRadius;
-    }
-
-    setDefaultValuesForMultiple() {
-        // const selectedBalls = this.getSelectedSites().filter(site => site instanceof HilbertBall);
-        // if (selectedBalls.length > 1) {
-        //     const { colorInputId, radiusInputId } = this.getPropertyElements(selectedBalls[0].constructor.name);
-
-        //     const commonColor = selectedBalls[0].boundaryColor;
-        //     const allSameColor = selectedBalls.every(ball => ball.boundaryColor === commonColor);
-        //     document.getElementById(colorInputId).value = allSameColor ? commonColor : '#0000FF';
-
-        //     const commonRadius = selectedBalls[0].ballRadius;
-        //     const allSameRadius = selectedBalls.every(ball => ball.ballRadius === commonRadius);
-        //     document.getElementById(radiusInputId).value = allSameRadius ? commonRadius : '1';
-        // }
     }
 }

@@ -151,7 +151,7 @@ export class HilbertDistanceManager {
 
     updateSavedDistances() {
         this.savedDistances = this.savedDistances.map(distance => {
-            if (distance.static || distance.permanentlyStatic) return distance; // Do not update static distances
+            if (distance.static || distance.permanentlyStatic) return distance;
             const site1 = this.canvas.sites.find(site => site.label === distance.points[0]);
             const site2 = this.canvas.sites.find(site => site.label === distance.points[1]);
             if (site1 && site2) {
@@ -160,7 +160,6 @@ export class HilbertDistanceManager {
                     value: hilbertDistance(site1, site2, site1.convexPolygon)
                 };
             } else {
-                // If one of the sites is deleted, keep the distance static
                 return distance;
             }
         });
