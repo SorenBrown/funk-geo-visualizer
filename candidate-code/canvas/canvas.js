@@ -79,19 +79,29 @@ export class Canvas {
     }
     
     createNgon(n) {
-        const centerX = this.canvasWidth / 2.5;
-        const centerY = this.canvasHeight / 1.8;
-        const radius = Math.min(this.canvasWidth, this.canvasHeight) * 1.09 ;
+        const canvasCenterX = this.canvas.width / (2 * this.dpr);
+        const canvasCenterY = this.canvas.height / (2 * this.dpr);
+        
+        const radius = Math.min(this.canvas.width, this.canvas.height) / (2.5 * this.dpr);
         
         this.polygon = new ConvexPolygon();
         
+        const tempVertices = [];
         for (let i = 0; i < n; i++) {
             const angle = (i / n) * 2 * Math.PI - Math.PI / 2;
-            const x = centerX + radius * Math.cos(angle) / 2;
-            const y = centerY + radius * Math.sin(angle) / 2;
-            this.polygon.addVertex(new Point(x + 1, y - 1));
+            const x = radius * Math.cos(angle);
+            const y = radius * Math.sin(angle);
+            tempVertices.push({x, y});
         }
-    
+        
+        const centroidX = tempVertices.reduce((sum, v) => sum + v.x, 0) / n;
+        const centroidY = tempVertices.reduce((sum, v) => sum + v.y, 0) / n;
+        
+        for (const vertex of tempVertices) {
+            const adjustedX = canvasCenterX + (vertex.x - centroidX);
+            const adjustedY = canvasCenterY + (vertex.y - centroidY);
+            this.polygon.addVertex(new Point(adjustedX, adjustedY));
+        }
     }
 
     setHilbertDistanceManager(hilbertDistanceManager) {
