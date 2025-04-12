@@ -25,6 +25,7 @@ A site $s$ is a point located in the interior of the polygon with an associated 
 To add a site to the polygon, select the `Site` program from the menu and double-click inside the polygon.
 
 [Screen Recording 2025-04-11 at 1.54.33 PM.mov](demos/Screen_Recording_2025-04-11_at_1.54.33_PM.mov)
+[![YouTube](http://i.ytimg.com/vi/PdGqMP26EjU/hqdefault.jpg)](https://www.youtube.com/watch?v=PdGqMP26EjU)
 
 ### Metric Balls
 
