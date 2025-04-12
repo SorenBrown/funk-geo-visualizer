@@ -23,7 +23,6 @@ After creating your polygon, click `Insert Funk` to explore the behavior of the 
 A site $s$ is a point located in the interior of the polygon with an associated set of *spokes.* Spokes are line segments passing through the point and vertices of the polygon. 
 
 To add a site to the polygon, select the `Site` program from the menu and double-click inside the polygon.
-
 [![YouTube](http://i.ytimg.com/vi/PdGqMP26EjU/hqdefault.jpg)](https://www.youtube.com/watch?v=PdGqMP26EjU)
 
 
@@ -36,9 +35,8 @@ Using the visualizer, you’ll be able to explore the balls of four different ge
 - **Hilbert Ball:** Defined by the Hilbert Metric, the average of the Forward and Reverse Funk weak metrics. Hilbert Balls are proper metric balls and are convex polygons with at most $2m$ sides.
 - **Thompson Ball:** The intersection of the Forward and Reverse Funk balls. Thompson Balls are not pseudo-disks and can be sandwiched between Hilbert balls of radius $\frac{r}{2}$ and $r$
 
-To add a ball to to the polygon, first navigate to the `Metric Balls` program and select the ball type(s). Then, double-click inside the polygon to add the ball or multi-ball to the polygon. 
-
-[Screen Recording 2025-04-11 at 7.39.57 PM.mov](demos/Screen_Recording_2025-04-11_at_7.39.57_PM.mov)
+To add a ball to to the polygon, first navigate to the `Metric Balls` program and select the ball type(s). Then, double-click inside the polygon to add the ball or multi-ball to the polygon.
+[![YouTube](http://i.ytimg.com/vi/bADxdcAqMds/hqdefault.jpg)](https://www.youtube.com/watch?v=bADxdcAqMds)
 
 ### Hilbert Distance
 
@@ -52,7 +50,8 @@ This distance is projectively invariant and increases dramatically as points app
 
 In the visualizer, first navigate to the `Hilbert Distance` program. Then, select two sites (hold down shift or shift + drag) and right click to open a context menu. You can then either calculate the hilbert distance (temporary display) or save the hilbert distance in the sidebar. If you save the distance in the sidebar, you can track its changes by clicking on the tracking icon next to the delete icon.
 
-[Screen Recording 2025-04-11 at 7.58.37 PM.mov](demos/Screen_Recording_2025-04-11_at_7.58.37_PM.mov)
+[![YouTube](http://i.ytimg.com/vi/_pbgpspmTmQ/hqdefault.jpg)](https://www.youtube.com/watch?v=_pbgpspmTmQ)
+
 
 ### Hilbert & Thompson Bisector
 
@@ -64,11 +63,11 @@ In the visualizer, first navigate to the `Bisector` program (if you want to save
 
 **Hilbert Bisector**
 
-[Screen Recording 2025-04-11 at 8.02.30 PM.mov](demos/Screen_Recording_2025-04-11_at_8.02.30_PM.mov)
+[![YouTube](http://i.ytimg.com/vi/0vWj-IHRMHI/hqdefault.jpg)](https://www.youtube.com/watch?v=0vWj-IHRMHI)
 
 **Thompson Bisector**
 
-[Screen Recording 2025-04-11 at 8.05.47 PM.mov](demos/Screen_Recording_2025-04-11_at_8.05.47_PM.mov)
+[![YouTube](http://i.ytimg.com/vi/au8opBFvQxM/hqdefault.jpg)](https://www.youtube.com/watch?v=au8opBFvQxM)
 
 ### Hilbert Metric Space Visualization
 
@@ -84,8 +83,8 @@ In the visualizer, you can explore your Hilbert polygonal geometry in two ways. 
 
 **Click + Drag**
 
-[Screen Recording 2025-04-11 at 8.22.16 PM.mov](demos/Screen_Recording_2025-04-11_at_8.22.16_PM.mov)
+[![YouTube](http://i.ytimg.com/vi/_FSQJjyygEA/hqdefault.jpg)](https://www.youtube.com/watch?v=_FSQJjyygEA)
 
 **Rocket Ship**
 
-[Screen Recording 2025-04-11 at 8.18.49 PM.mov](demos/Screen_Recording_2025-04-11_at_8.18.49_PM.mov)
+[![YouTube](http://i.ytimg.com/vi/RVpDuXa4zIM/hqdefault.jpg)](https://www.youtube.com/watch?v=RVpDuXa4zIM)
