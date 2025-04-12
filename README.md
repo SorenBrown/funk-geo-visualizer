@@ -23,6 +23,7 @@ After creating your polygon, click `Insert Funk` to explore the behavior of the 
 A site $s$ is a point located in the interior of the polygon with an associated set of *spokes.* Spokes are line segments passing through the point and vertices of the polygon. 
 
 To add a site to the polygon, select the `Site` program from the menu and double-click inside the polygon.
+
 [![YouTube](http://i.ytimg.com/vi/PdGqMP26EjU/hqdefault.jpg)](https://www.youtube.com/watch?v=PdGqMP26EjU)
 
 
@@ -36,6 +37,7 @@ Using the visualizer, you’ll be able to explore the balls of four different ge
 - **Thompson Ball:** The intersection of the Forward and Reverse Funk balls. Thompson Balls are not pseudo-disks and can be sandwiched between Hilbert balls of radius $\frac{r}{2}$ and $r$
 
 To add a ball to to the polygon, first navigate to the `Metric Balls` program and select the ball type(s). Then, double-click inside the polygon to add the ball or multi-ball to the polygon.
+
 [![YouTube](http://i.ytimg.com/vi/bADxdcAqMds/hqdefault.jpg)](https://www.youtube.com/watch?v=bADxdcAqMds)
 
 ### Hilbert Distance
