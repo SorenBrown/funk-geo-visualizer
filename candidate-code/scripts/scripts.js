@@ -4,6 +4,7 @@ import { HilbertBallManager } from "../hilbert-ball/hilbert-ball.js";
 import { BisectorManager } from "../bisector/bisector.js";
 import { HilbertDistanceManager } from "../hilbert-distance/hilbert-distance.js";
 import { SpaceManager } from "../space/space.js";
+import { BruteForceVoronoiManager } from "../voronoi/brute-force-voronoi.js"; // Add this import
 
 import { 
     initializeDropdowns, 
@@ -19,6 +20,7 @@ let hilbertDistanceManager = new HilbertDistanceManager(canvas);
 let bisectorManager = new BisectorManager(canvas);
 let siteManager = new SiteManager(canvas, hilbertDistanceManager, bisectorManager);
 let spaceManager = new SpaceManager(canvas);
+let voronoiManager = new BruteForceVoronoiManager(canvas, siteManager); // Add this
 
 canvas.setHilbertDistanceManager(hilbertDistanceManager);
 bisectorManager.setSiteManager(siteManager);
@@ -28,7 +30,8 @@ let managers = [
     siteManager,
     hilbertDistanceManager,
     bisectorManager,
-    spaceManager
+    spaceManager,
+    voronoiManager // Add this
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
