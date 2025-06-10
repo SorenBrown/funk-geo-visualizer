@@ -1,5 +1,5 @@
-import { Point } from "../../default-objects.js";
-import { hilbertDistance } from "../../default-functions.js"; // Assuming this exists; if not, see note below
+import { Point, Segment } from "../../default-objects.js";
+import { hilbertDistance } from "../../default-functions.js";
 
 export class BruteForceVoronoiManager {
     constructor(canvas, siteManager) {
@@ -28,7 +28,7 @@ export class BruteForceVoronoiManager {
         const minX = Math.min(...polygon.vertices.map(v => v.x));
         const maxX = Math.max(...polygon.vertices.map(v => v.x));
         const minY = Math.min(...polygon.vertices.map(v => v.y));
-        const maxY = Math.max(...this.canvas.polygon.vertices.map(v => v.y));
+        const maxY = Math.max(...polygon.vertices.map(v => v.y));
 
         // For each pixel in the polygon
         for (let x = minX; x <= maxX; x += resolution) {
@@ -41,7 +41,7 @@ export class BruteForceVoronoiManager {
                     let closestSite = null;
 
                     for (const site of sites) {
-                        const dist = hilbertDistance(site, point); // Replace with your distance function if needed
+                        const dist = hilbertDistance(site, point, polygon);
                         if (dist < minDist) {
                             minDist = dist;
                             closestSite = site;
