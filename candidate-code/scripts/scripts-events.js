@@ -1,9 +1,8 @@
-// scripts-events.js
 import { HilbertDistanceManager } from "../hilbert-distance/hilbert-distance.js";
 import { SiteManager } from "../site/site.js";
 
 function setDisplay(element, display) {
-    element.style.display = display;
+    if (element) element.style.display = display;
 }
 
 function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
@@ -12,17 +11,14 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
     const ffunkCollapsible = document.getElementById('ffunkBallCollapsible');
     const rfunkCollapsible = document.getElementById('rfunkBallCollapsible');
     const thompsonCollapsible = document.getElementById('thompsonBallCollapsible');
+    const voronoiCollapsible = document.getElementById('voronoiCollapsible'); // Voronoi collapsible
     const savedDistancesContainer = document.getElementById('savedDistancesContainer');
     const savedBisectorsContainer = document.getElementById('savedBisectorsContainer');
-    const metricBallSelectionCard = document.getElementById('metricBallSelectionCard'); // New card
+    const metricBallSelectionCard = document.getElementById('metricBallSelectionCard');
     const settingsLabel = document.getElementById('general-settings');
     const siteColorInput = document.getElementById('colorContainer');
     const multiBallRadiusContainer = document.getElementById('multiBallRadiusContainer');
     const spriteModeButton = document.getElementById('spriteModeButton');
-
-    const setDisplay = (element, display) => {
-        if (element) element.style.display = display;
-    };
 
     const displayMap = {
         'Metric Balls': () => {
@@ -31,11 +27,12 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
             setDisplay(ffunkCollapsible, 'block');
             setDisplay(rfunkCollapsible, 'block');
             setDisplay(thompsonCollapsible, 'block');
+            setDisplay(voronoiCollapsible, 'none');
             setDisplay(savedDistancesContainer, 'none');
             setDisplay(savedBisectorsContainer, 'none');
-            setDisplay(metricBallSelectionCard, 'block'); // Show the card
-            setDisplay(settingsLabel, 'block'); 
-            setDisplay(siteColorInput, 'none'); 
+            setDisplay(metricBallSelectionCard, 'block');
+            setDisplay(settingsLabel, 'block');
+            setDisplay(siteColorInput, 'none');
             setDisplay(multiBallRadiusContainer, 'block');
             setDisplay(spriteModeButton, 'none');
 
@@ -54,10 +51,11 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
             setDisplay(ffunkCollapsible, 'none');
             setDisplay(rfunkCollapsible, 'none');
             setDisplay(thompsonCollapsible, 'none');
+            setDisplay(voronoiCollapsible, 'none');
             setDisplay(savedDistancesContainer, 'none');
             setDisplay(savedBisectorsContainer, 'none');
-            setDisplay(metricBallSelectionCard, 'none'); 
-            setDisplay(settingsLabel, 'block'); 
+            setDisplay(metricBallSelectionCard, 'none');
+            setDisplay(settingsLabel, 'block');
             setDisplay(siteColorInput, 'block');
             setDisplay(multiBallRadiusContainer, 'none');
             setDisplay(spriteModeButton, 'none');
@@ -76,10 +74,11 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
             setDisplay(ffunkCollapsible, 'none');
             setDisplay(rfunkCollapsible, 'none');
             setDisplay(thompsonCollapsible, 'none');
+            setDisplay(voronoiCollapsible, 'none');
             setDisplay(savedBisectorsContainer, 'none');
-            setDisplay(metricBallSelectionCard, 'none'); 
-            setDisplay(settingsLabel, 'none'); 
-            setDisplay(siteColorInput, 'none'); 
+            setDisplay(metricBallSelectionCard, 'none');
+            setDisplay(settingsLabel, 'none');
+            setDisplay(siteColorInput, 'none');
             setDisplay(multiBallRadiusContainer, 'none');
             setDisplay(spriteModeButton, 'none');
 
@@ -104,14 +103,14 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
             setDisplay(ffunkCollapsible, 'none');
             setDisplay(rfunkCollapsible, 'none');
             setDisplay(thompsonCollapsible, 'none');
+            setDisplay(voronoiCollapsible, 'none');
             setDisplay(savedDistancesContainer, 'none');
             setDisplay(savedBisectorsContainer, 'block');
             setDisplay(metricBallSelectionCard, 'none');
-            setDisplay(siteColorInput, 'none'); 
+            setDisplay(siteColorInput, 'none');
             setDisplay(multiBallRadiusContainer, 'none');
             setDisplay(spriteModeButton, 'none');
-
-            setDisplay(settingsLabel, 'none'); 
+            setDisplay(settingsLabel, 'none');
 
             managers.forEach(manager => {
                 if (manager.name === 'SiteManager' || manager.name === 'BisectorManager') {
@@ -129,11 +128,12 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
             setDisplay(ffunkCollapsible, 'none');
             setDisplay(rfunkCollapsible, 'none');
             setDisplay(thompsonCollapsible, 'none');
+            setDisplay(voronoiCollapsible, 'none');
             setDisplay(savedDistancesContainer, 'none');
             setDisplay(savedBisectorsContainer, 'none');
             setDisplay(metricBallSelectionCard, 'none');
-            setDisplay(siteColorInput, 'none'); 
-            setDisplay(settingsLabel, 'none'); 
+            setDisplay(siteColorInput, 'none');
+            setDisplay(settingsLabel, 'none');
             setDisplay(multiBallRadiusContainer, 'none');
             setDisplay(spriteModeButton, 'block');
 
@@ -148,18 +148,46 @@ function updateCollapsibleVisibility(selectedProgram, managers, canvas) {
             canvas.activeManager = 'SpaceManager';
             canvas.deselectAllSites();
         },
+        // --- New: Brute Force Voronoi ---
+        'Brute Force Voronoi': () => {
+            setDisplay(siteCollapsible, 'block');
+            setDisplay(hilbertCollapsible, 'none');
+            setDisplay(ffunkCollapsible, 'none');
+            setDisplay(rfunkCollapsible, 'none');
+            setDisplay(thompsonCollapsible, 'none');
+            setDisplay(voronoiCollapsible, 'block');
+            setDisplay(savedDistancesContainer, 'none');
+            setDisplay(savedBisectorsContainer, 'none');
+            setDisplay(metricBallSelectionCard, 'none');
+            setDisplay(settingsLabel, 'block');
+            setDisplay(siteColorInput, 'none');
+            setDisplay(multiBallRadiusContainer, 'none');
+            setDisplay(spriteModeButton, 'none');
+
+            managers.forEach(manager => {
+                if (manager.name === 'BruteForceVoronoiManager') {
+                    manager.activate();
+                } else {
+                    manager.deactivate();
+                }
+            });
+
+            canvas.activeManager = 'BruteForceVoronoiManager';
+        },
         'default': () => {
             setDisplay(siteCollapsible, 'none');
             setDisplay(hilbertCollapsible, 'none');
             setDisplay(ffunkCollapsible, 'none');
             setDisplay(rfunkCollapsible, 'none');
             setDisplay(thompsonCollapsible, 'none');
+            setDisplay(voronoiCollapsible, 'none');
             setDisplay(savedDistancesContainer, 'none');
             setDisplay(savedBisectorsContainer, 'none');
-            setDisplay(metricBallSelectionCard, 'none'); 
-            setDisplay(siteColorInput, 'none'); 
+            setDisplay(metricBallSelectionCard, 'none');
+            setDisplay(siteColorInput, 'none');
             setDisplay(multiBallRadiusContainer, 'none');
             setDisplay(spriteModeButton, 'none');
+            setDisplay(settingsLabel, 'none');
         }
     };
 
@@ -247,4 +275,3 @@ inputs.forEach((input) => {
     }
   });
 });
-
